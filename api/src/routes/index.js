@@ -1,0 +1,19 @@
+const express = require('express');
+const router = express.Router();
+const AuthRoutes = require('./auth.routes');
+const AdeudosRoutes = require('./adeudos.routes');
+const LibrosRoutes = require('./libros.routes');
+const AlumnosRoutes = require('./alumnos.routes');
+const BitacoraRoutes = require('./bitacora.routes');
+const PrestamosRoutes = require('./prestamos.routes');
+const ConstanciaLiberacionRoutes = require("./constancia/constancia_liberacion.routes");
+
+router.use('/alumnos', AlumnosRoutes);
+router.use('/prestamos', PrestamosRoutes);
+router.use('/libros', LibrosRoutes);
+router.use('/adeudos', AdeudosRoutes);
+router.use('/auth', AuthRoutes);
+router.use('/bitacora', BitacoraRoutes);
+router.use('/constancia/liberacion', ConstanciaLiberacionRoutes);
+
+module.exports = router;

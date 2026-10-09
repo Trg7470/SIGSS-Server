@@ -2,17 +2,12 @@ const path = require("path");
 
 const RUTAS = {
 
-     // Documentos Word temporales
-    temporalesDocx: path.join(__dirname, "../../storage/temporales/docx"),
+    // Aquí irán las rutas que más se utilizarán en el proyecto, esto con el fin de que si se hacen cambios de ubicación
+    // de algún archivo, no se tenga que cambiar en todos los archivos donde se esté utilizando, sino que solo se cambie aquí.
 
-    // Documentos PDF temporales
-    temporalesPdf: path.join(__dirname, "../../storage/temporales/pdf"),
 
-    //Recursos generales
-    recursos: path.join(__dirname, "../recursos"),
 
-    //plantilla constancia liberacion
-    plantilla_constancia: path.join(__dirname, "../recursos/plantilla_constancia"),
+
 
 };
 

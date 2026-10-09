@@ -9,7 +9,7 @@ app.use('/api', routes);
 
 app.get("/", (req, res) => {
     res.json({
-        mensaje: 'API en NodeJS funcionando correctamente.'
+        mensaje: 'API del Sistema SIGSS funcionando correctamente.'
     });
 });
 

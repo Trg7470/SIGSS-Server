@@ -1,0 +1,336 @@
+
+/* ========================================
+   SIGSS | Sistema de ventanas emergentes
+   ======================================== */
+
+:root {
+    --popup-azul-oscuro: #12366b;
+    --popup-azul: #1769aa;
+    --popup-azul-claro: #eaf3ff;
+    --popup-fondo: #ffffff;
+    --popup-texto: #243247;
+    --popup-texto-secundario: #64748b;
+    --popup-borde: #e2e8f0;
+    --popup-sombra: 0 24px 70px rgba(15, 39, 75, 0.20);
+    --popup-radio: 20px;
+}
+
+/* Fondo y contenedor principal */
+
+.sigss-popup-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(12, 29, 54, 0.48);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.22s ease,
+        visibility 0.22s ease;
+}
+
+.sigss-popup-overlay.is-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Ventana */
+
+.sigss-popup {
+    position: relative;
+    width: 100%;
+    max-width: 430px;
+    padding: 32px;
+    overflow: hidden;
+    background: var(--popup-fondo);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: var(--popup-radio);
+    box-shadow: var(--popup-sombra);
+    text-align: center;
+    transform: translateY(12px) scale(0.98);
+    transition: transform 0.22s ease;
+}
+
+.sigss-popup-overlay.is-visible .sigss-popup {
+    transform: translateY(0) scale(1);
+}
+
+/* Detalle superior institucional */
+
+.sigss-popup::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(
+        90deg,
+        var(--popup-azul-oscuro),
+        #398de0
+    );
+}
+
+/* Icono */
+
+.sigss-popup-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 20px;
+    border-radius: 24px;
+    background: var(--popup-azul-claro);
+    color: var(--popup-azul);
+}
+
+.sigss-popup-icono svg {
+    width: 38px;
+    height: 38px;
+}
+
+/* Textos */
+
+.sigss-popup-titulo {
+    margin: 0 0 10px;
+    color: var(--popup-azul-oscuro);
+    font-size: 23px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.sigss-popup-mensaje {
+    margin: 0;
+    color: var(--popup-texto-secundario);
+    font-size: 15px;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+/* Indicador de carga */
+
+.sigss-popup-spinner {
+    width: 42px;
+    height: 42px;
+    margin: 24px auto 0;
+    border: 4px solid #dbeafe;
+    border-top-color: var(--popup-azul);
+    border-radius: 50%;
+    animation: sigss-girar 0.8s linear infinite;
+}
+
+@keyframes sigss-girar {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Botones */
+
+.sigss-popup-acciones {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.sigss-popup-boton {
+    min-height: 44px;
+    padding: 11px 20px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background 0.18s ease,
+        transform 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.sigss-popup-boton:hover {
+    transform: translateY(-1px);
+}
+
+.sigss-popup-boton:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+.sigss-popup-boton--principal {
+    color: #ffffff;
+    background: var(--popup-azul);
+    box-shadow: 0 4px 12px rgba(23, 105, 170, 0.2);
+}
+
+.sigss-popup-boton--principal:hover {
+    background: var(--popup-azul-oscuro);
+}
+
+.sigss-popup-boton--secundario {
+    color: var(--popup-texto);
+    background: #f1f5f9;
+    border-color: var(--popup-borde);
+}
+
+.sigss-popup-boton--secundario:hover {
+    background: #e2e8f0;
+}
+
+/* Variantes de estado */
+
+.sigss-popup--exito .sigss-popup-icono {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+.sigss-popup--error .sigss-popup-icono {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+.sigss-popup--confirmacion .sigss-popup-icono {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+/* Accesibilidad y pantallas pequeñas */
+
+@media (max-width: 480px) {
+    .sigss-popup {
+        padding: 28px 22px;
+        border-radius: 17px;
+    }
+
+    .sigss-popup-titulo {
+        font-size: 21px;
+    }
+
+    .sigss-popup-acciones {
+        flex-direction: column-reverse;
+    }
+
+    .sigss-popup-boton {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sigss-popup-overlay,
+    .sigss-popup,
+    .sigss-popup-boton {
+        transition: none;
+    }
+
+    .sigss-popup-spinner {
+        animation-duration: 2s;
+    }
+}
+
+
+/* Selector de formato de exportación SIGSS */
+.sigss-popup-formatos {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.sigss-popup-formato {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #d8e2ef;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    transition: border-color .2s ease, background .2s ease;
+}
+
+.sigss-popup-formato:has(input:checked) {
+    border-color: #1769aa;
+    background: #eaf3ff;
+    box-shadow: 0 0 0 2px rgba(23, 105, 170, .08);
+}
+
+.sigss-popup-formato input {
+    width: 17px;
+    height: 17px;
+    accent-color: #1769aa;
+    flex-shrink: 0;
+}
+
+.sigss-popup-formato-icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+.sigss-xlsx {
+    color: #16845b;
+    background: #e6f7ef;
+}
+
+.sigss-pdf {
+    color: #b42323;
+    background: #fff0f0;
+}
+
+.sigss-popup-formato-texto {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sigss-popup-formato-texto strong {
+    color: #12366b;
+    font-size: 15px;
+}
+
+.sigss-popup-formato-texto small {
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.4;
+}
+
+.sigss-popup-acciones-botones {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    width: 100%;
+}
+
+.sigss-popup-acciones-botones .sigss-popup-boton {
+    flex: 1;
+    min-width: 0;
+}
+
+@media (max-width: 380px) {
+    .sigss-popup-acciones-botones {
+        flex-direction: column-reverse;
+    }
+}
+
+.sigss-popup--formato .sigss-popup-acciones {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+}

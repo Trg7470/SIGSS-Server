@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Prueba de exportación | SIGSS</title>
+
+    <link rel="stylesheet" href="/css/popup.css">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+            background: #f1f5f9;
+            color: #12366b;
+        }
+
+        .contenedor {
+            width: 100%;
+            max-width: 480px;
+            padding: 35px;
+            box-sizing: border-box;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 10px 35px rgba(18, 54, 107, .10);
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 0;
+            font-size: 26px;
+        }
+
+        p {
+            color: #64748b;
+            line-height: 1.6;
+        }
+
+        .botones {
+            display: grid;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .botones button {
+            padding: 13px;
+            border: none;
+            border-radius: 10px;
+            background: #1769aa;
+            color: white;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .botones button:hover {
+            background: #12366b;
+        }
+
+        .botones .error {
+            background: #b91c1c;
+        }
+
+        .botones .confirmar {
+            background: #475569;
+        }
+
+        .nota {
+            margin-top: 20px;
+            font-size: 12px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="contenedor">
+        <h1>SIGSS</h1>
+
+        <p>
+            Genera y descarga documentos clínicos en Excel o PDF.
+        </p>
+
+        <div class="botones">
+            <button
+                id="btn-exportar"
+                type="button"
+                onclick="iniciarExportacion()"
+            >
+                Exportar documento
+            </button>
+
+            <button
+                type="button"
+                onclick="Popup.exito(
+                    'El popup de éxito funciona correctamente.'
+                )"
+            >
+                Probar éxito
+            </button>
+
+            <button
+                class="error"
+                type="button"
+                onclick="Popup.error(
+                    'Este es un error de prueba.'
+                )"
+            >
+                Probar error
+            </button>
+
+            <button
+                class="confirmar"
+                type="button"
+                onclick="probarConfirmacion()"
+            >
+                Probar confirmación
+            </button>
+        </div>
+
+        <p class="nota">
+            SIGSS · Sistema de generación de documentos
+        </p>
+    </main>
+
+    <script src="/js/popup.js"></script>
+
+    <script>
+        'use strict';
+
+        const API_EXPORTACION = '/api/documentos/exportar';
+
+        // Identificador del formato registrado en el backend.
+        const FORMATO_DOCUMENTO = 'paciente';
+
+        let exportacionEnCurso = false;
+
+        /**
+         * Solicita la generación y descarga del documento real.
+         */
+        async function iniciarExportacion() {
+            if (exportacionEnCurso) return;
+
+            exportacionEnCurso = true;
+
+            const botonExportar =
+                document.getElementById('btn-exportar');
+
+            botonExportar.disabled = true;
+
+            let urlTemporal = null;
+
+            try {
+                // 1. Mostrar el selector de formato.
+                const tipoSalida =
+                    await Popup.seleccionarFormato();
+
+                // El usuario canceló.
+                if (!tipoSalida) return;
+
+                // 2. Mostrar el popup de carga.
+                Popup.cargando(
+                    `Generando tu documento ${tipoSalida.toUpperCase()}. Por favor, espera...`
+                );
+
+                // 3. Solicitar la generación al backend.
+                const respuesta = await fetch(API_EXPORTACION, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept':
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/pdf, application/json'
+                    },
+                    body: JSON.stringify({
+                        formato: FORMATO_DOCUMENTO,
+                        tipoSalida
+                    })
+                });
+
+                // 4. Si el backend respondió con un error,
+                // intentar recuperar su mensaje JSON.
+                if (!respuesta.ok) {
+                    let mensaje =
+                        `No fue posible generar el documento (HTTP ${respuesta.status}).`;
+
+                    try {
+                        const contenidoError =
+                            await respuesta.json();
+
+                        if (contenidoError.mensaje) {
+                            mensaje = contenidoError.mensaje;
+                        }
+                    } catch {
+                        // Conservar el mensaje HTTP predeterminado.
+                    }
+
+                    throw new Error(mensaje);
+                }
+
+                // 5. Recibir el archivo generado.
+                const archivo = await respuesta.blob();
+
+                if (!archivo.size) {
+                    throw new Error(
+                        'El servidor devolvió un archivo vacío.'
+                    );
+                }
+
+                // 6. Crear una URL temporal para la descarga.
+                urlTemporal = URL.createObjectURL(archivo);
+
+                const enlace = document.createElement('a');
+                enlace.href = urlTemporal;
+
+                enlace.download =
+                    tipoSalida === 'pdf'
+                        ? 'SIGSS_paciente.pdf'
+                        : 'SIGSS_paciente.xlsx';
+
+                enlace.style.display = 'none';
+                document.body.appendChild(enlace);
+
+                enlace.click();
+                enlace.remove();
+
+                Popup.exito(
+                    `¡Tu documento ${tipoSalida.toUpperCase()} está listo. La descarga se ha iniciado.`
+                );
+
+            } catch (error) {
+                console.error(
+                    '[SIGSS] Error durante la exportación:',
+                    error
+                );
+
+                Popup.error(
+                    error.message ||
+                    'Ocurrió un error durante la generación del documento.'
+                );
+
+            } finally {
+                // Liberar los recursos temporales del navegador.
+                if (urlTemporal) {
+                    setTimeout(() => {
+                        URL.revokeObjectURL(urlTemporal);
+                    }, 1000);
+                }
+
+                exportacionEnCurso = false;
+                botonExportar.disabled = false;
+            }
+        }
+
+        /**
+         * Prueba el diálogo de confirmación.
+         */
+        async function probarConfirmacion() {
+            const confirmado = await Popup.confirmar(
+                '¿Deseas continuar con esta operación?'
+            );
+
+            if (confirmado) {
+                Popup.exito('¡Confirmaste la operación!');
+            }
+        }
+    </script>
+</body>
+</html>

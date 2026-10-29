@@ -1,0 +1,330 @@
+{
+    "clave_edad": [
+        {
+            "Id_Cat_Clave_Edad": 1,
+            "Nombre": "DÍAS",
+            "Clave": "D"
+        },
+        {
+            "Id_Cat_Clave_Edad": 2,
+            "Nombre": "MESES",
+            "Clave": "M"
+        },
+        {
+            "Id_Cat_Clave_Edad": 3,
+            "Nombre": "AÑOS",
+            "Clave": "A"
+        }
+    ],
+    "sexo_biologico": [
+        {
+            "Id_Cat_Sexo_Biologico": 1,
+            "Nombre": "HOMBRE",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Sexo_Biologico": 2,
+            "Nombre": "MUJER",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Sexo_Biologico": 3,
+            "Nombre": "INTERSEXUAL",
+            "Clave": 3
+        }
+    ],
+    "migrante": [
+        {
+            "Id_Cat_Migrante": 1,
+            "Nombre": "NO",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Migrante": 2,
+            "Nombre": "NACIONAL",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Migrante": 3,
+            "Nombre": "INTERNACIONAL",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Migrante": 4,
+            "Nombre": "RETORNADO",
+            "Clave": 3
+        }
+    ],
+    "instrumento_glucosa": [
+        {
+            "Id_Cat_Instrumento_Glucosa": 1,
+            "Nombre": "LABORATORIO",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Instrumento_Glucosa": 2,
+            "Nombre": "TIRA DE GLUCOSA CAPILAR",
+            "Clave": 2
+        }
+    ],
+    "rt": [
+        {
+            "Id_Cat_Rt": 1,
+            "Nombre": "PRIMERA VEZ",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Rt": 2,
+            "Nombre": "SUBSECUENTE",
+            "Clave": 1
+        }
+    ],
+    "confirmacion_diagnostica": [
+        {
+            "Id_Cat_Confirmacion_Diagnostica": 1,
+            "Nombre": "PROBABLE",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Confirmacion_Diagnostica": 2,
+            "Nombre": "SOSPECHOSO",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Confirmacion_Diagnostica": 3,
+            "Nombre": "CONFIRMADO",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Confirmacion_Diagnostica": 4,
+            "Nombre": "DESCARTADO",
+            "Clave": 3
+        },
+        {
+            "Id_Cat_Confirmacion_Diagnostica": 5,
+            "Nombre": "NO ESPECIFICADO",
+            "Clave": 9
+        }
+    ],
+    "intervenciones_salud_mental_adicciones": [
+        {
+            "Id_Cat_Intervenciones_Salud_Mental_Adicciones": 1,
+            "Nombre": "INTERVENCION PSICOSOCIAL",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Intervenciones_Salud_Mental_Adicciones": 2,
+            "Nombre": "TRATAMIENTO FARMACOLÓGICO",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Intervenciones_Salud_Mental_Adicciones": 3,
+            "Nombre": "AMBOS",
+            "Clave": 3
+        }
+    ],
+    "plan_seguridad": [
+        {
+            "Id_Cat_Plan_Seguridad": 1,
+            "Nombre": "INICIAL",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Plan_Seguridad": 2,
+            "Nombre": "REFORZAMIENTO",
+            "Clave": 2
+        }
+    ],
+    "trimestre_gestacional": [
+        {
+            "Id_Cat_Trimestre_Gestacional": 1,
+            "Nombre": "PRIMERO",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Trimestre_Gestacional": 2,
+            "Nombre": "SEGUNDO",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Trimestre_Gestacional": 3,
+            "Nombre": "TERCERO",
+            "Clave": 3
+        }
+    ],
+    "otras_acciones_embarazadas": [
+        {
+            "Id_Cat_Otras_Acciones_Embarazadas": 1,
+            "Nombre": "PRESCRIPCIÓN DE ÁCIDO FÓLICO",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Otras_Acciones_Embarazadas": 2,
+            "Nombre": "APOYO A TRASLADO OBSTÉTRICO DE EMERGENCIA",
+            "Clave": 3
+        },
+        {
+            "Id_Cat_Otras_Acciones_Embarazadas": 3,
+            "Nombre": "APOYO DE TRANSPORTE AME PARA ACUDIR A SITIO DE REFERENCIA",
+            "Clave": 4
+        }
+    ],
+    "otros_eventos": [
+        {
+            "Id_Cat_Otros_Eventos": 1,
+            "Nombre": "PERI Y POSTMENOPAUSIA",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Otros_Eventos": 2,
+            "Nombre": "ITS",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Otros_Eventos": 3,
+            "Nombre": "PATOLOGÍA MAMARIA BENIGNA",
+            "Clave": 3
+        },
+        {
+            "Id_Cat_Otros_Eventos": 4,
+            "Nombre": "CÁNCER MAMARIO",
+            "Clave": 4
+        },
+        {
+            "Id_Cat_Otros_Eventos": 5,
+            "Nombre": "COLPOSCOPÍA",
+            "Clave": 5
+        },
+        {
+            "Id_Cat_Otros_Eventos": 6,
+            "Nombre": "CÁNCER CERVICOUTERINO",
+            "Clave": 6
+        }
+    ],
+    "edi_tipo": [
+        {
+            "Id_Cat_Edi_Tipo": 1,
+            "Nombre": "INICIAL",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Edi_Tipo": 2,
+            "Nombre": "SUBSECUENTE",
+            "Clave": 2
+        }
+    ],
+    "resultados_edi": [
+        {
+            "Id_Cat_Resultados_Edi": 1,
+            "Nombre": "VERDE",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Resultados_Edi": 2,
+            "Nombre": "AMARILLO",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Resultados_Edi": 3,
+            "Nombre": "ROJO",
+            "Clave": 3
+        },
+        {
+            "Id_Cat_Resultados_Edi": 4,
+            "Nombre": "RECUPERADO DE REZAGO",
+            "Clave": 4
+        },
+        {
+            "Id_Cat_Resultados_Edi": 5,
+            "Nombre": "RECUPERADO DE RIESGO DE RETRASO",
+            "Clave": 5
+        },
+        {
+            "Id_Cat_Resultados_Edi": 6,
+            "Nombre": "EN SEGUIMIENTO",
+            "Clave": 6
+        }
+    ],
+    "resultado_batelle": [
+        {
+            "Id_Cat_Resultado_Batelle": 1,
+            "Nombre": "MAYOR O IGUAL A 90",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Resultado_Batelle": 2,
+            "Nombre": "DE 89 A 80",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Resultado_Batelle": 3,
+            "Nombre": "MENOR O IGUAL A 79",
+            "Clave": 3
+        }
+    ],
+    "eda_plan_tratamiento": [
+        {
+            "Id_Cat_Eda_Plan_Tratamiento": 1,
+            "Nombre": "A",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Eda_Plan_Tratamiento": 2,
+            "Nombre": "B",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Eda_Plan_Tratamiento": 3,
+            "Nombre": "C",
+            "Clave": 3
+        }
+    ],
+    "ira_tratamiento": [
+        {
+            "Id_Cat_Ira_Tratamiento": 1,
+            "Nombre": "SINTOMÁTICO",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Ira_Tratamiento": 2,
+            "Nombre": "ANTIBIÓTICO",
+            "Clave": 2
+        }
+    ],
+    "aplicacion_cedula_cancer_anio": [
+        {
+            "Id_Cat_Aplicacion_Cedula_Cancer_Anio": 1,
+            "Nombre": "PRIMERA VEZ",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Aplicacion_Cedula_Cancer_Anio": 2,
+            "Nombre": "SEGUNDA VEZ",
+            "Clave": 2
+        }
+    ],
+    "esquema_vacunacion": [
+        {
+            "Id_Cat_Esquema_Vacunacion": 1,
+            "Nombre": "ESQUEMA INCOMPLETO",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Esquema_Vacunacion": 2,
+            "Nombre": "ESQUEMA COMPLETO",
+            "Clave": 1
+        }
+    ],
+    "modalidad": [
+        {
+            "Id_Cat_Modalidad": 1,
+            "Nombre": "EN TIEMPO REAL",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Modalidad": 2,
+            "Nombre": "DIFERIDA",
+            "Clave": 2
+        }
+    ]
+}

@@ -1,19 +1,20 @@
+'use strict';
 
 const path = require('path');
 
-const RUTAS = {
-    // Directorio principal del proyecto
-    raiz: path.join(__dirname, '..', '..'),
-    // Formatos de Excel
-    formatosExcel: path.join(__dirname, '..', 'recursos', 'formatos'),
-    // Archivos Excel generados temporalmente
-    temporalesExcel: path.join(__dirname, '..', 'temp', 'xls'),
-    // Archivos PDF generados temporalmente
-    temporalesPDF: path.join(__dirname, '..', 'temp', 'pdf'),
-    // Directorio de servicios de documentos
-    serviciosDocumentos: path.join(__dirname, '..', 'services', 'documentos'),
-    // Ejecutable de LibreOffice
-    libreOffice: 'soffice',
-};
+/**
+ * Rutas centralizadas del backend de SIGSS.
+ */
+module.exports = {
+    // Carpeta que contiene los formatos de Excel (plantillas) que se pueden exportar.
+    formatos_excel: path.join(__dirname, '..', 'recursos', 'formatos'),
 
-module.exports = RUTAS;
+    // Carpeta donde se guardan los XLSX generados temporalmente.
+    temporales_excel: path.join(__dirname, '..', 'temp', 'xls'),
+
+    // Carpeta donde se guardan los PDF generados temporalmente.
+    temporales_pdf: path.join(__dirname, '..', 'temp', 'pdf'),
+
+    // Ruta al ejecutable de LibreOffice (conversión headless XLSX -> PDF).
+    libre_office: 'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
+};

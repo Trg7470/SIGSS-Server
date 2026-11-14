@@ -17,6 +17,28 @@ class Pacientes {
 
         return rows[0];
     }
+     static async actualizar(Id_Paciente, data, columnas, connection = mysqlPool) {
+        const campos = Object.keys(data).filter(
+            campo => columnas.includes(campo)
+        );
+
+        if (campos.length === 0) {
+            return { success: true, affectedRows: 0 };
+        }
+
+        const asignaciones = campos
+            .map(campo => `\`${campo}\` = COALESCE(?, \`${campo}\`)`)
+            .join(', ');
+
+        const valores = campos.map(campo => data[campo] ?? null);
+
+        const [resultado] = await connection.query(
+            `UPDATE Pacientes SET ${asignaciones} WHERE Id_Paciente = ?`,
+            [...valores, Id_Paciente]
+        );
+
+        return { success: resultado.affectedRows > 0 };
+    }
 }
 
 module.exports = Pacientes;

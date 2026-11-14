@@ -2,10 +2,10 @@ const {mysqlPool} = require('../config/mysql');
 
 class Bitacora
 {
-    static async registrar(Id_Usuario, Accion, Modulo, Tabla_Afectada)
+    static async registrar(Id_Usuario, Accion, Modulo, Tabla_Afectada, connection = mysqlPool)
     {
         try {
-            const [rows] = await mysqlPool.query(
+            const [rows] = await connection.query(
                 `INSERT INTO Bitacora (Usuarios_Id_Usuario, Fecha_Hora, Accion, Modulo, Tabla_Afectada)
                 VALUES (?, ?, ?, ?, ?)`,
                 [Id_Usuario, new Date(), Accion, Modulo, Tabla_Afectada]

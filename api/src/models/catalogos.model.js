@@ -34,7 +34,7 @@ class Catalogos
     {
         const [rows] = await mysqlPool.query(
             'SELECT * FROM Cat_Diagnosticos WHERE Nombre LIKE ?',
-            [`${nombre}%`]
+            [`%${nombre}%`]
         );
         return rows;
     }
@@ -64,7 +64,7 @@ class Catalogos
         const [rows] = await mysqlPool.query(
             'SELECT * FROM Cat_Implante_Subdermico'
         );
-        return rows;        
+        return rows;
     }
     static async intervenciones_gerontologicas()
     {
@@ -79,7 +79,7 @@ class Catalogos
             'SELECT * FROM Cat_Medicina_Tradicional'
         );
         return rows;
-    
+
     }
     static async referido_motivo()
     {

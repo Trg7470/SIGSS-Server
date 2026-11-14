@@ -1,7 +1,6 @@
 const AuthService = require('../services/auth.service');
 
 class AuthController {
-
     static async login(req, res) {
         const { Usuario, Password } = req.body;
 
@@ -18,15 +17,20 @@ class AuthController {
                 Password
             );
 
+            res.cookie('token', resultado.token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'lax',
+                maxAge: 6 * 60 * 60 * 1000,
+                path: '/'
+            });
+
             return res.status(200).json({
                 success: true,
                 message: 'Inicio de sesión exitoso.',
-                token: resultado.token,
                 usuario: resultado.usuario
             });
-
         } catch (error) {
-
             if (
                 error.message === 'Credenciales inválidas.' ||
                 error.message === 'El usuario se encuentra inactivo.'

@@ -170,7 +170,7 @@ class UsuariosModel {
             u.Nombre,
             u.Apellido_Paterno,
             u.Apellido_Materno,
-            u.Nombre_Usuario,
+            u.Usuario,
             u.Password,
             u.Id_Rol,
             r.Nombre AS Rol,

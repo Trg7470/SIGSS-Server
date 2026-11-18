@@ -4,8 +4,8 @@ class ConsultasDiagnosticos {
     static async registrar(data, connection = mysqlPool) 
     {
         const [result] = await connection.query(
-            `INSERT INTO Consulta_Diagnosticos (Consultas_Id_Consulta, Cat_Diagnosticos_Id_Cat_Diagnosticos, Confirmacion_Diagnostica, Primera_Vez, Cat_Medicina_
-            Tradicional_Id_Cat_Medicina_Tradicional) 
+            `INSERT INTO Consulta_Diagnosticos (Consultas_Id_Consulta, Cat_Diagnosticos_Id_Cat_Diagnosticos, Confirmacion_Diagnostica, Primera_Vez, 
+            Cat_Medicina_Tradicional_Id_Cat_Medicina_Tradicional) 
             VALUES (?, ?, ?, ?, ?)`,
             [data.Id_Consulta, 
             data.Cat_Diagnosticos_Id_Cat_Diagnosticos, 

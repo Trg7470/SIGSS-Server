@@ -5,7 +5,7 @@ class ConsultaDiscapacidades {
     {
         const [result] = await connection.query(
             `INSERT INTO Consulta_Discapacidades (Cat_Discapacidades_Id_Discapacidad, Consultas_Id_Consulta) VALUES (?, ?)`,
-            [data.discapacidades.Cat_Discapacidades_Id_Discapacidad, data.discapacidades.Consultas_Id_Consulta]);
+            [data.Cat_Discapacidades_Id_Discapacidad, data.Id_Consulta]);
         return {success: true, Id_Consulta_Discapacidades: result.insertId};
     }
 }

@@ -6,9 +6,14 @@ const PacientesRoutes = require('./pacientes.routes');
 const PrestadoresRoutes = require('./prestadores.routes'); 
 const CatalogosRoutes = require('./catalogos.routes');
 const ConsultaExternaRoutes = require('./consulta_externa.routes');
+const PlanificacionFamiliarRoutes = require('./planificacion_familiar.routes');
+const DocumentosRoutes = require('./documentos.routes');
+
+router.use('/modules/planificacion-familiar', PlanificacionFamiliarRoutes);
 
 router.use('/modules/consulta-externa', ConsultaExternaRoutes);
 
+router.use('/documentos', DocumentosRoutes);
 
 router.use('/catalogos', CatalogosRoutes);
 router.use('/unidades', UnidadesRoutes);

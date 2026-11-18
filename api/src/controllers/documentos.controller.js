@@ -1,36 +1,49 @@
 const fs = require('fs/promises');
-const { ExportarFormato } = require('../services/documentos/exportarFormato.service');
+const { exportar_formato } = require('../services/documentos/exportar_formato.service');
+const { consultar_formato } = require('../services/documentos/consultar_formato.service');
 
 /**
  * Genera un documento Excel o PDF y lo entrega al navegador.
  * Limpia los archivos temporales después de la transferencia.
  */
-async function ExportarDocumento(req, res) {
+async function exportar_documento(req, res) {
     let archivo;
 
     try {
-        const { formato, tipoSalida } = req.body || {};
+        // Ruta GET: todo viene por query string, nunca por body. Se usan
+        // los mismos nombres que ya manda el cliente (snake_case).
+        const { formato, tipo_salida, id_consulta, fecha, clues, nombre_archivo } = req.query || {};
 
         if (
             typeof formato !== 'string' ||
             !formato.trim() ||
-            typeof tipoSalida !== 'string' ||
-            !tipoSalida.trim()
+            typeof tipo_salida !== 'string' ||
+            !tipo_salida.trim()
         ) {
             return res.status(400).json({
                 mensaje: 'Debe indicar el formato y el tipo de salida.',
             });
         }
 
-        // Generar el documento solicitado.
-        archivo = await ExportarFormato(
+        // El backend arma "datos" (encabezado + registros) consultando la
+        // vista del módulo: por una sola consulta (botón de la fila del
+        // historial) o por el día completo (hoja SINBA-SIS).
+        const datos = await consultar_formato(formato.trim(), {
+            id_consulta,
+            fecha,
+            clues,
+        });
+
+        archivo = await exportar_formato(
             formato.trim(),
-            tipoSalida.trim().toLowerCase()
+            tipo_salida.trim().toLowerCase(),
+            datos,
+            nombre_archivo
         );
 
         if (
-            typeof archivo.rutaArchivo !== 'string' ||
-            typeof archivo.nombreArchivo !== 'string'
+            typeof archivo.ruta_archivo !== 'string' ||
+            typeof archivo.nombre_descarga !== 'string'
         ) {
             throw new Error(
                 'El servicio no devolvió la información del archivo.'
@@ -40,16 +53,15 @@ async function ExportarDocumento(req, res) {
         // Incluir todos los archivos temporales que deban eliminarse.
         const archivosTemporales = [
             ...new Set(
-                Array.isArray(archivo.archivosTemporales)
-                    ? archivo.archivosTemporales
-                    : [archivo.rutaArchivo]
+                Array.isArray(archivo.archivos_temporales)
+                    ? archivo.archivos_temporales
+                    : [archivo.ruta_archivo]
             ),
         ];
 
-        // Enviar el archivo directamente al navegador.
         return res.download(
-            archivo.rutaArchivo,
-            archivo.nombreArchivo,
+            archivo.ruta_archivo,
+            archivo.nombre_descarga,
             async (error) => {
                 // Eliminar los temporales tras finalizar la transferencia.
                 const resultados = await Promise.allSettled(
@@ -94,14 +106,12 @@ async function ExportarDocumento(req, res) {
             error.message
         );
 
-        // Si la generación falla, limpiar los archivos que alcanzaron
-        // a crearse y que el servicio haya registrado.
         if (archivo) {
             const archivosTemporales = [
                 ...new Set(
-                    Array.isArray(archivo.archivosTemporales)
-                        ? archivo.archivosTemporales
-                        : [archivo.rutaArchivo].filter(Boolean)
+                    Array.isArray(archivo.archivos_temporales)
+                        ? archivo.archivos_temporales
+                        : [archivo.ruta_archivo].filter(Boolean)
                 ),
             ];
 
@@ -120,4 +130,4 @@ async function ExportarDocumento(req, res) {
     }
 }
 
-module.exports = { ExportarDocumento };
+module.exports = { exportar_documento };

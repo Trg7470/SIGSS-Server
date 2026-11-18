@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const {ExportarDocumento,} = require('../controllers/documentos.controller');
+const {exportar_documento} = require('../controllers/documentos.controller');
 
-router.post('/exportar', ExportarDocumento);
+router.get('/exportar', exportar_documento);
 
 module.exports = router;

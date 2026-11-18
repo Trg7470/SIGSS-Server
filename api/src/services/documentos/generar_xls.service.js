@@ -7,11 +7,13 @@ const JSZip = require('jszip');
 const RUTAS = require('../../config/rutas');
 const U = require('../../utils/plantilla_xlsx');
 const CONSULTA_EXTERNA_CONFIG = require('../../config/formatos/consulta_externa.config');
+const PLANIFICACION_FAMILIAR_CONFIG = require('../../config/formatos/planificacion_familiar.config');
 
 // Formatos registrados. Para agregar otro basta con crear su archivo de
 // configuración en ./formatos y registrarlo aquí.
 const FORMATOS = {
     [CONSULTA_EXTERNA_CONFIG.id]: CONSULTA_EXTERNA_CONFIG,
+    [PLANIFICACION_FAMILIAR_CONFIG.id]: PLANIFICACION_FAMILIAR_CONFIG,
 };
 
 // Límite de seguridad para evitar archivos enormes por un error de consulta.
@@ -144,16 +146,45 @@ function rellenar_hoja(xml_base, configuracion, contexto, encabezado, registros_
         return estilos.clonar(base, { shrinkToFit: '1' });
     };
 
-    // Encabezado (CLUES, unidad, prestador, tipo de personal, cédula)
+    // Encabezado (CLUES, unidad, prestador, tipo de personal, cédula).
+    // La mayoría de las celdas son un valor suelto, pero algunas (p. ej.
+    // nombre_prestador) ya traen una etiqueta impresa en la plantilla que
+    // debe conservarse junto al valor, igual que en los campos de registros
+    // marcados con "titulo": configuracion.encabezado[clave] puede ser un
+    // string (celda) o un objeto { celda, titulo: true }.
     for (const [clave, valor] of Object.entries(encabezado)) {
         if (clave === 'fecha' || valor_vacio(valor)) {
             continue;
         }
-        const referencia = configuracion.encabezado[clave];
-        xml = U.escribir_celda(xml, referencia, valor, {
-            estilo: estilo_ajustado(xml, referencia),
-            tam: 9,
-        });
+        const campo_encabezado = configuracion.encabezado[clave];
+        const referencia = typeof campo_encabezado === 'string'
+            ? campo_encabezado
+            : campo_encabezado.celda;
+
+        if (typeof campo_encabezado === 'object' && campo_encabezado.titulo) {
+            const celda = U.buscar_celda(xml, referencia);
+            if (!celda) {
+                throw new Error(`La celda ${referencia} (${clave}) no existe en la plantilla.`);
+            }
+            const estilo_actual = U.obtener_estilo_celda(celda[1]);
+            const etiqueta = U.leer_texto_celda(xml, referencia, cadenas);
+            xml = U.escribir_celda(xml, referencia, valor, {
+                titulo: etiqueta,
+                // Solo "wrapText": "shrinkToFit" obliga a Excel a encoger la
+                // letra para que etiqueta y valor entren en una sola línea,
+                // lo que anula el salto de línea ("\n") que escribir_celda
+                // ya pone entre ambos y hace que el valor nunca baje de
+                // renglón (ver el mismo patrón, sin shrinkToFit, abajo en
+                // el bucle de "registros").
+                estilo: estilos.clonar(estilo_actual, { wrapText: '1' }),
+                tam: 9,
+            });
+        } else {
+            xml = U.escribir_celda(xml, referencia, valor, {
+                estilo: estilo_ajustado(xml, referencia),
+                tam: 9,
+            });
+        }
     }
 
     // Fecha: tres recuadros (día, mes, año) en la parte superior derecha.

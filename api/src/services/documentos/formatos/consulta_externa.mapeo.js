@@ -22,7 +22,7 @@ module.exports = {
     folio_receta: { columna: 'folio_receta' },
     expediente: { columna: 'expediente' },
     curp: { columna: 'curp' },
-    nombre: { columna: 'nombre' },
+    nombre: { columna: 'nombre_paciente' },
 
     // --- Edad (compuesto: Edad + Nombre de clave_edad) ---
     edad: {

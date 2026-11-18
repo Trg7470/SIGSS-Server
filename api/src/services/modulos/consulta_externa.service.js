@@ -110,6 +110,105 @@ class ConsultaExternaService {
             connection.release();
         }
     }
+
+    /**
+     * Historial de consultas externas: reutiliza vista_consulta_externa (la
+     * misma que alimenta la exportación a Excel/PDF) en vez de mantener una
+     * vista aparte solo para este listado. Pide nada más las columnas que
+     * pinta la tabla; obtener_detalle() trae la fila completa para el modal.
+     *
+     * Un día específico es un rango donde fecha_inicial === fecha_final; no
+     * se trata como caso especial aquí.
+     *
+     * @param {object} filtros
+     * @param {string} filtros.fecha_inicial - 'YYYY-MM-DD'.
+     * @param {string} filtros.fecha_final   - 'YYYY-MM-DD'.
+     * @param {string} [filtros.busqueda]    - Texto libre (nombre, CURP o folio).
+     * @param {number} [filtros.pagina=1]
+     * @param {number} [filtros.limite=10]
+     * @returns {Promise<{registros: object[], total: number, pagina: number, limite: number}>}
+     */
+    static async buscar_historial(filtros) {
+        const {
+            fecha_inicial,
+            fecha_final,
+            busqueda = '',
+            pagina = 1,
+            limite = 10,
+        } = filtros || {};
+
+        if (!fecha_inicial || !fecha_final) {
+            throw new Error('fecha_inicial y fecha_final son obligatorias.');
+        }
+
+        const texto_busqueda = String(busqueda).trim();
+        const hay_busqueda = texto_busqueda.length > 0;
+        const comodin = `%${texto_busqueda}%`;
+
+        const filtro_busqueda_sql = hay_busqueda
+            ? 'AND (nombre_paciente LIKE ? OR curp LIKE ? OR folio_receta LIKE ?)'
+            : '';
+        const parametros_busqueda = hay_busqueda ? [comodin, comodin, comodin] : [];
+
+        const pagina_segura = Math.max(1, Number(pagina) || 1);
+        const limite_seguro = Math.max(1, Number(limite) || 10);
+        const offset = (pagina_segura - 1) * limite_seguro;
+
+        // Total de registros que cumplen el filtro, para la paginación.
+        const [filas_total] = await mysqlPool.query(
+            `SELECT COUNT(*) AS total
+             FROM vista_consulta_externa
+             WHERE fecha BETWEEN ? AND ?
+             ${filtro_busqueda_sql}`,
+            [fecha_inicial, fecha_final, ...parametros_busqueda]
+        );
+        const total = filas_total[0].total;
+
+        // Página de resultados, solo con las columnas que pinta la tabla.
+        const [registros] = await mysqlPool.query(
+            `SELECT
+                id_consulta,
+                folio_receta,
+                expediente,
+                fecha,
+                nombre,
+                nombre_paciente,
+                apellido_paterno,
+                apellido_materno,
+                curp
+             FROM vista_consulta_externa
+             WHERE fecha BETWEEN ? AND ?
+             ${filtro_busqueda_sql}
+             ORDER BY fecha DESC, id_consulta DESC
+             LIMIT ? OFFSET ?`,
+            [fecha_inicial, fecha_final, ...parametros_busqueda, limite_seguro, offset]
+        );
+
+        return {
+            registros,
+            total,
+            pagina: pagina_segura,
+            limite: limite_seguro,
+        };
+    }
+
+    /**
+     * Fila completa de vista_consulta_externa para una sola consulta, para
+     * llenar el modal "Ver detalles" del historial.
+     *
+     * @param {number|string} id_consulta
+     * @returns {Promise<object|null>} La fila completa, o null si no existe.
+     */
+    static async obtener_detalle(id_consulta) {
+        const [filas] = await mysqlPool.query(
+            `SELECT *
+             FROM vista_consulta_externa
+             WHERE id_consulta = ?
+             LIMIT 1`,
+            [id_consulta]
+        );
+        return filas[0] || null;
+    }
 }
 
 module.exports = ConsultaExternaService;

@@ -7,14 +7,15 @@ const PrestadoresRoutes = require('./prestadores.routes');
 const CatalogosRoutes = require('./catalogos.routes');
 const ConsultaExternaRoutes = require('./consulta_externa.routes');
 const PlanificacionFamiliarRoutes = require('./planificacion_familiar.routes');
+const SaludBucalRoutes = require('./salud_bucal.routes');
 const DocumentosRoutes = require('./documentos.routes');
 
-router.use('/modules/planificacion-familiar', PlanificacionFamiliarRoutes);
 
+router.use('/modules/planificacion-familiar', PlanificacionFamiliarRoutes);
 router.use('/modules/consulta-externa', ConsultaExternaRoutes);
+router.use('/modules/salud-bucal', SaludBucalRoutes);
 
 router.use('/documentos', DocumentosRoutes);
-
 router.use('/catalogos', CatalogosRoutes);
 router.use('/unidades', UnidadesRoutes);
 router.use('/auth', AuthRoutes);

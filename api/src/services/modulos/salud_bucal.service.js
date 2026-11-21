@@ -148,7 +148,7 @@ class SaludBucalService {
         const comodin = `%${texto_busqueda}%`;
 
         const filtro_busqueda_sql = hay_busqueda
-            ? 'AND (nombre LIKE ? OR curp LIKE ? OR folio_receta LIKE ?)'
+            ? 'AND (nombre_paciente LIKE ? OR curp LIKE ? OR folio_receta LIKE ?)'
             : '';
         const parametros_busqueda = hay_busqueda ? [comodin, comodin, comodin] : [];
 
@@ -172,6 +172,9 @@ class SaludBucalService {
                 expediente,
                 fecha,
                 nombre,
+                nombre_paciente,
+                apellido_paterno,
+                apellido_materno,
                 curp
              FROM vista_salud_bucal
              WHERE fecha BETWEEN ? AND ?

@@ -22,7 +22,7 @@
  * también donde se arma el objeto "registro" antes de enviarlo.
  *
  * Para crear otro formato se copia este archivo y se ajustan estas tablas:
- * el generador no cambia.
+ * el generador no cambia..
  */
 
 const campo = (col, fila = 0, extra = {}) => ({ col, fila, ...extra });

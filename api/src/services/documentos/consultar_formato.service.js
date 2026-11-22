@@ -4,9 +4,18 @@ const { mysqlPool } = require('../../config/mysql');
 const { resolver_catalogo } = require('../../utils/catalogos');
 const CONSULTA_EXTERNA_MAPEO = require('./formatos/consulta_externa.mapeo');
 const PLANIFICACION_FAMILIAR_MAPEO = require('./formatos/planificacion_familiar.mapeo');
+const SALUD_BUCAL_MAPEO = require('./formatos/salud_bucal.mapeo');
 
-const MAPEOS = { 'consulta-externa': CONSULTA_EXTERNA_MAPEO, 'planificacion-familiar': PLANIFICACION_FAMILIAR_MAPEO };
-const VISTAS = { 'consulta-externa': 'vista_consulta_externa', 'planificacion-familiar': 'vista_planificacion_familiar' };
+const MAPEOS = {
+    'consulta-externa': CONSULTA_EXTERNA_MAPEO,
+    'planificacion-familiar': PLANIFICACION_FAMILIAR_MAPEO,
+    'salud-bucal': SALUD_BUCAL_MAPEO,
+};
+const VISTAS = {
+    'consulta-externa': 'vista_consulta_externa',
+    'planificacion-familiar': 'vista_planificacion_familiar',
+    'salud-bucal': 'vista_salud_bucal',
+};
 
 function resolver_campo(origen, fila) {
     if (typeof origen.calcular === 'function') {

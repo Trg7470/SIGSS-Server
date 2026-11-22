@@ -8,12 +8,14 @@ const RUTAS = require('../../config/rutas');
 const U = require('../../utils/plantilla_xlsx');
 const CONSULTA_EXTERNA_CONFIG = require('../../config/formatos/consulta_externa.config');
 const PLANIFICACION_FAMILIAR_CONFIG = require('../../config/formatos/planificacion_familiar.config');
+const SALUD_BUCAL_CONFIG = require('../../config/formatos/salud_bucal.config');
 
 // Formatos registrados. Para agregar otro basta con crear su archivo de
 // configuración en ./formatos y registrarlo aquí.
 const FORMATOS = {
     [CONSULTA_EXTERNA_CONFIG.id]: CONSULTA_EXTERNA_CONFIG,
     [PLANIFICACION_FAMILIAR_CONFIG.id]: PLANIFICACION_FAMILIAR_CONFIG,
+    [SALUD_BUCAL_CONFIG.id]: SALUD_BUCAL_CONFIG,
 };
 
 // Límite de seguridad para evitar archivos enormes por un error de consulta.

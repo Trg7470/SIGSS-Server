@@ -165,21 +165,26 @@ class ConsultaExternaService {
         const total = filas_total[0].total;
 
         // Página de resultados, solo con las columnas que pinta la tabla.
+        // id_nota_medica viene de un LEFT JOIN aparte (no de vista_consulta_externa,
+        // que no sabe nada de Notas_Medicas): NULL si esta consulta todavía no
+        // tiene una, para que el frontend sepa si mostrar el botón o no.
         const [registros] = await mysqlPool.query(
             `SELECT
-                id_consulta,
-                folio_receta,
-                expediente,
-                fecha,
-                nombre,
-                nombre_paciente,
-                apellido_paterno,
-                apellido_materno,
-                curp
-             FROM vista_consulta_externa
-             WHERE fecha BETWEEN ? AND ?
+                vce.id_consulta,
+                vce.folio_receta,
+                vce.expediente,
+                vce.fecha,
+                vce.nombre,
+                vce.nombre_paciente,
+                vce.apellido_paterno,
+                vce.apellido_materno,
+                vce.curp,
+                nm.Id_Nota_Medica AS id_nota_medica
+             FROM vista_consulta_externa vce
+             LEFT JOIN Notas_Medicas nm ON nm.Consultas_Id_Consulta = vce.id_consulta
+             WHERE vce.fecha BETWEEN ? AND ?
              ${filtro_busqueda_sql}
-             ORDER BY fecha DESC, id_consulta DESC
+             ORDER BY vce.fecha DESC, vce.id_consulta DESC
              LIMIT ? OFFSET ?`,
             [fecha_inicial, fecha_final, ...parametros_busqueda, limite_seguro, offset]
         );

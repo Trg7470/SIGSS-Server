@@ -119,7 +119,7 @@ class PlanificacionFamiliarService {
 
             await connection.commit();
 
-            return { success: true, Id_Consulta };
+            return { success: true, Id_Consulta};
         }
         catch (error) {
             await connection.rollback();
@@ -132,10 +132,11 @@ class PlanificacionFamiliarService {
 
 
     /**
-     * Historial de consultas externas: reutiliza vista_consulta_externa (la
-     * misma que alimenta la exportación a Excel/PDF) en vez de mantener una
-     * vista aparte solo para este listado. Pide nada más las columnas que
-     * pinta la tabla; obtener_detalle() trae la fila completa para el modal.
+     * Historial de consultas de planificación familiar: reutiliza
+     * vista_planificacion_familiar (la misma que alimenta la exportación a
+     * Excel/PDF) en vez de mantener una vista aparte solo para este listado.
+     * Pide nada más las columnas que pinta la tabla; obtener_detalle() trae
+     * la fila completa para el modal.
      *
      * Un día específico es un rango donde fecha_inicial === fecha_final; no
      * se trata como caso especial aquí.
@@ -185,21 +186,27 @@ class PlanificacionFamiliarService {
         const total = filas_total[0].total;
 
         // Página de resultados, solo con las columnas que pinta la tabla.
+        // id_nota_medica viene de un LEFT JOIN aparte (no de
+        // vista_planificacion_familiar, que no sabe nada de Notas_Medicas):
+        // NULL si esta consulta todavía no tiene una, para que el frontend
+        // sepa si mostrar el botón o no.
         const [registros] = await mysqlPool.query(
             `SELECT
-                id_consulta,
-                folio_receta,
-                expediente,
-                fecha,
-                nombre,
-                nombre_paciente,
-                apellido_paterno,
-                apellido_materno,
-                curp
-             FROM vista_planificacion_familiar
-             WHERE fecha BETWEEN ? AND ?
+                vpf.id_consulta,
+                vpf.folio_receta,
+                vpf.expediente,
+                vpf.fecha,
+                vpf.nombre,
+                vpf.nombre_paciente,
+                vpf.apellido_paterno,
+                vpf.apellido_materno,
+                vpf.curp,
+                nm.Id_Nota_Medica AS id_nota_medica
+             FROM vista_planificacion_familiar vpf
+             LEFT JOIN Notas_Medicas nm ON nm.Consultas_Id_Consulta = vpf.id_consulta
+             WHERE vpf.fecha BETWEEN ? AND ?
              ${filtro_busqueda_sql}
-             ORDER BY fecha DESC, id_consulta DESC
+             ORDER BY vpf.fecha DESC, vpf.id_consulta DESC
              LIMIT ? OFFSET ?`,
             [fecha_inicial, fecha_final, ...parametros_busqueda, limite_seguro, offset]
         );

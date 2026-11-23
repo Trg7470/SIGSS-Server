@@ -9,8 +9,9 @@ const ConsultaExternaRoutes = require('./consulta_externa.routes');
 const PlanificacionFamiliarRoutes = require('./planificacion_familiar.routes');
 const SaludBucalRoutes = require('./salud_bucal.routes');
 const DocumentosRoutes = require('./documentos.routes');
+const NotaMedicaRoutes = require('./nota_medica.routes');
 
-
+router.use('/modules/nota-medica', NotaMedicaRoutes);
 router.use('/modules/planificacion-familiar', PlanificacionFamiliarRoutes);
 router.use('/modules/consulta-externa', ConsultaExternaRoutes);
 router.use('/modules/salud-bucal', SaludBucalRoutes);

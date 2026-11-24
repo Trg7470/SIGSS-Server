@@ -81,6 +81,29 @@ class Catalogos
         return rows;
 
     }
+    /**
+     * Autocompletado de medicamentos para la Nota Médica: coincidencia
+     * parcial por nombre genérico o por clave, solo catálogo activo.
+     * Se limita a 20 resultados porque alimenta un buscador en vivo.
+     */
+    static async medicamentos(texto)
+    {
+        const comodin = `%${texto}%`;
+        const [rows] = await mysqlPool.query(
+            `SELECT
+                Id_Cat_Medicamento AS id_cat_medicamento,
+                Clave               AS clave,
+                Nombre_Generico     AS nombre_generico,
+                Forma_Farmaceutica  AS forma_farmaceutica,
+                Presentacion_Envase AS presentacion_envase
+             FROM Cat_Medicamentos
+             WHERE Activo = 1 AND (Nombre_Generico LIKE ? OR Clave LIKE ?)
+             ORDER BY Nombre_Generico
+             LIMIT 20`,
+            [comodin, comodin]
+        );
+        return rows;
+    }
     static async referido_motivo()
     {
         const [rows] = await mysqlPool.query(

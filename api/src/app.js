@@ -5,7 +5,12 @@ const routes = require('./routes/index')
 const cookieparser = require('cookie-parser');
 const path = require('path');
 
-app.use(cors());
+
+app.use(cors({
+    origin: true,
+    credentials: true,
+    exposedHeaders: ['Content-Disposition'],
+}));
 app.use(express.json());
 app.use(cookieparser());
 app.use('/api', routes);

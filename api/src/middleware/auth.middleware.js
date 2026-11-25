@@ -24,7 +24,16 @@ function verificarToken(req, res, next) {
         });
     }
 }
+function verificarRol(...roles_permitidos) {
+    return (req, res, next) => {
+        if (!req.usuario || !roles_permitidos.includes(req.usuario.Id_Rol)) {
+            return res.status(403).json({ mensaje: 'No tienes permisos para esta acción' });
+        }
+        next();
+    };
+}
 
 module.exports = {
-    verificarToken
+    verificarToken,
+    verificarRol
 };

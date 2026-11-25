@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const AuthRoutes = require('./auth.routes');
+const BitacoraRoutes = require('./bitacora.routes');
 const UnidadesRoutes = require('./unidades.routes');
 const PacientesRoutes = require('./pacientes.routes');
 const PrestadoresRoutes = require('./prestadores.routes');
@@ -18,6 +19,7 @@ router.use('/modules/consulta-externa', ConsultaExternaRoutes);
 router.use('/modules/salud-bucal', SaludBucalRoutes);
 router.use('/modules/detecciones', DeteccionesRoutes);
 
+router.use('/bitacora', BitacoraRoutes);
 router.use('/documentos', DocumentosRoutes);
 router.use('/catalogos', CatalogosRoutes);
 router.use('/unidades', UnidadesRoutes);

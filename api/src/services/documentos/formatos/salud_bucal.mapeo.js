@@ -129,7 +129,10 @@ module.exports = {
     esquema_vacunacion: { columna: 'esquema_vacunacion_id', catalogo: 'esquema_vacunacion' },
 
     // --- Referencia, contrarreferencia y teleconsulta ---
-    referido_por: { columna: 'referido_por' },
+    // BC = "¿Fue referido?" (Si/No). El instructivo de esta hoja no trae
+    // catálogo de motivo de referido (a diferencia de Consulta Externa),
+    // por eso aquí es booleano y no se resuelve contra Cat_Referido_Motivo.
+    referido: { columna: 'referido', booleano: true },
     referido_nivel: { columna: 'referido_nivel' },
     referido_especialidad: { columna: 'referido_especialidad' },
     contrarreferido: { columna: 'contrarreferido', booleano: true },

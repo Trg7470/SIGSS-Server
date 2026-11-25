@@ -9,6 +9,7 @@ const U = require('../../utils/plantilla_xlsx');
 const CONSULTA_EXTERNA_CONFIG = require('../../config/formatos/consulta_externa.config');
 const PLANIFICACION_FAMILIAR_CONFIG = require('../../config/formatos/planificacion_familiar.config');
 const SALUD_BUCAL_CONFIG = require('../../config/formatos/salud_bucal.config');
+const DETECCIONES_CONFIG = require('../../config/formatos/detecciones.config');
 
 // Formatos registrados. Para agregar otro basta con crear su archivo de
 // configuración en ./formatos y registrarlo aquí.
@@ -16,6 +17,7 @@ const FORMATOS = {
     [CONSULTA_EXTERNA_CONFIG.id]: CONSULTA_EXTERNA_CONFIG,
     [PLANIFICACION_FAMILIAR_CONFIG.id]: PLANIFICACION_FAMILIAR_CONFIG,
     [SALUD_BUCAL_CONFIG.id]: SALUD_BUCAL_CONFIG,
+    [DETECCIONES_CONFIG.id]: DETECCIONES_CONFIG,
 };
 
 // Límite de seguridad para evitar archivos enormes por un error de consulta.
@@ -198,10 +200,6 @@ function rellenar_hoja(xml_base, configuracion, contexto, encabezado, registros_
             horizontal: 'center',
             vertical: 'center',
             shrinkToFit: '1',
-            // El estilo base puede traer textRotation heredado de la
-            // plantilla (p. ej. de un encabezado de columna vertical); la
-            // fecha siempre debe verse horizontal, así que se fuerza aquí.
-            textRotation: '0',
         });
         xml = U.escribir_celda(xml, `${desde}${cfg_fecha.fila}`, partes[parte], { estilo, tam: 10 });
         xml = U.agregar_combinacion(xml, `${desde}${cfg_fecha.fila}:${hasta}${cfg_fecha.fila}`);
@@ -211,10 +209,25 @@ function rellenar_hoja(xml_base, configuracion, contexto, encabezado, registros_
     const { fila_inicial, altura_bloque, campos } = configuracion.registros;
     registros_hoja.forEach((registro, indice) => {
         for (const [clave, valor] of Object.entries(registro)) {
+            const { col, fila, titulo, desborda, centrado, limpiar_si_vacio } = campos[clave];
             if (valor_vacio(valor)) {
+                if (!limpiar_si_vacio) {
+                    continue;
+                }
+                // Algunas plantillas oficiales traen el numerito de la
+                // pregunta del instructivo impreso dentro de la propia
+                // celda de datos (no solo en la fila de leyenda). No se
+                // modifica la plantilla: aquí se sobrescribe esa celda con
+                // un valor vacío únicamente en el archivo generado, para
+                // que no se confunda con un dato capturado.
+                const referencia_vacia = `${col}${fila_inicial + indice * altura_bloque + fila}`;
+                const celda_vacia = U.buscar_celda(xml, referencia_vacia);
+                if (celda_vacia) {
+                    const estilo_vacio = U.obtener_estilo_celda(celda_vacia[1]);
+                    xml = U.escribir_celda(xml, referencia_vacia, '', { estilo: estilo_vacio });
+                }
                 continue;
             }
-            const { col, fila, titulo, desborda, centrado } = campos[clave];
             const referencia = `${col}${fila_inicial + indice * altura_bloque + fila}`;
             const celda = U.buscar_celda(xml, referencia);
             if (!celda) {

@@ -13,8 +13,8 @@ class DeteccionesRevaloraciones {
                  Incontinencia_Urinaria, Tiene_Caidas, Sindrome_Caidas,
                  Estabilidad_Marcha, Estado_Nutricion, Actividades_Basicas,
                  Evaluacion_ABVD, Actividades_Instrumentales, Evaluacion_AIVD,
-                 Sobrecarga_Cuidador, Grupo_Edad, Sexo, Resultado)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 Grupo_Edad, Sexo, Resultado)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.Ha_Olvidado,
                 data.Alteracion_Memoria,
@@ -29,7 +29,6 @@ class DeteccionesRevaloraciones {
                 data.Evaluacion_ABVD,
                 data.Actividades_Instrumentales,
                 data.Evaluacion_AIVD,
-                data.Sobrecarga_Cuidador,
                 data.Grupo_Edad,
                 data.Sexo,
                 data.Resultado,

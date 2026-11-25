@@ -51,6 +51,16 @@ module.exports = {
         mes: { rango: ['BD', 'BD'] },
         anio: { rango: ['BG', 'BG'] },
         estilo_base: 12,
+        // AZ, BD y BG tienen anchos distintos en la plantilla (y esas
+        // mismas columnas las reutilizan otros campos más abajo en la
+        // hoja, así que no se pueden ensanchar solo para la fecha). Con
+        // el encogido automático de Excel ("shrinkToFit", el
+        // comportamiento por defecto del motor genérico) cada valor se
+        // reducía a un tamaño distinto según el ancho de su columna. Con
+        // esta bandera en false, generar_xls.service.js imprime día, mes
+        // y año siempre al mismo tamaño completo y deja que se desborden
+        // sobre las celdas vacías vecinas si no caben.
+        encoger_a_la_celda: false,
     },
 
     registros: {
@@ -139,7 +149,10 @@ module.exports = {
             esquema_vacunacion: campo('BB'),
 
             // Referencia, contrarreferencia y teleconsulta
-            referido_por: campo('BC'),
+            // BC es "¿Fue referido?" (Si/No), NO el motivo del referido:
+            // el instructivo de esta hoja (SINBA-SIS-02-P) no trae ningún
+            // catálogo de motivo, a diferencia de Consulta Externa.
+            referido: campo('BC'),
             referido_nivel: campo('BD', 0, con_titulo),
             referido_especialidad: campo('BD', 2, con_titulo),
             contrarreferido: campo('BE'),

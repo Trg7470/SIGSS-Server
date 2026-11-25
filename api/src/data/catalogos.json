@@ -326,5 +326,99 @@
             "Nombre": "DIFERIDA",
             "Clave": 2
         }
+    ],
+    "respuesta_tamizaje": [
+        {
+            "Id_Cat_Respuesta_Tamizaje": 0,
+            "Nombre": "NO",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Respuesta_Tamizaje": 1,
+            "Nombre": "SI",
+            "Clave": 1
+        }
+    ],
+    "resultado_deteccion": [
+        {
+            "Id_Cat_Resultado_Deteccion": 0,
+            "Nombre": "POSITIVO",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Resultado_Deteccion": 1,
+            "Nombre": "NEGATIVO",
+            "Clave": 1
+        }
+    ],
+    "resultado_demencia_osteoporosis": [
+        {
+            "Id_Cat_Resultado_Demencia_Osteoporosis": 1,
+            "Nombre": "BAJO RIESGO",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Resultado_Demencia_Osteoporosis": 2,
+            "Nombre": "MEDIANO RIESGO",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Resultado_Demencia_Osteoporosis": 3,
+            "Nombre": "ALTO RIESGO",
+            "Clave": 3
+        }
+    ],
+    "edad_cuidador": [
+        {
+            "Id_Cat_Edad_Cuidador": 1,
+            "Nombre": "MENOR A 20 AÑOS DE EDAD",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Edad_Cuidador": 2,
+            "Nombre": "20 A 59 AÑOS DE EDAD",
+            "Clave": 2
+        },
+        {
+            "Id_Cat_Edad_Cuidador": 3,
+            "Nombre": "60 Y MÁS AÑOS DE EDAD",
+            "Clave": 3
+        }
+    ],
+    "cancer_cervicouterino": [
+        {
+            "Id_Cat_Cancer_Cervicouterino": 0,
+            "Nombre": "NO REALIZADO",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Cancer_Cervicouterino": 1,
+            "Nombre": "REALIZADO",
+            "Clave": 1
+        }
+    ],
+    "exploracion_cancer_mama": [
+        {
+            "Id_Cat_Exploracion_Cancer_Mama": 0,
+            "Nombre": "RESULTADO NORMAL",
+            "Clave": 0
+        },
+        {
+            "Id_Cat_Exploracion_Cancer_Mama": 1,
+            "Nombre": "RESULTADO ANORMAL",
+            "Clave": 1
+        }
+    ],
+    "tipo_prueba": [
+        {
+            "Id_Cat_Tipo_Prueba": 1,
+            "Nombre": "TREPONÉMICA",
+            "Clave": 1
+        },
+        {
+            "Id_Cat_Tipo_Prueba": 2,
+            "Nombre": "NO TREPONÉMICA",
+            "Clave": 2
+        }
     ]
 }

@@ -30,11 +30,19 @@ class Catalogos
         );
         return rows;
     }
+    /**
+     * Autocompletado de diagnósticos CIE-10: coincidencia parcial tanto por
+     * Nombre como por Clave (ej. "A00", "E119"), para que sirva igual si el
+     * médico escribe el nombre del diagnóstico o ya se sabe la clave de
+     * memoria. Se usa desde todos los módulos que capturan diagnóstico,
+     * ya que comparten este mismo endpoint.
+     */
     static async diagnosticos_nombre(nombre)
     {
+        const comodin = `%${nombre}%`;
         const [rows] = await mysqlPool.query(
-            'SELECT * FROM Cat_Diagnosticos WHERE Nombre LIKE ?',
-            [`%${nombre}%`]
+            'SELECT * FROM Cat_Diagnosticos WHERE Nombre LIKE ? OR Clave LIKE ?',
+            [comodin, comodin]
         );
         return rows;
     }

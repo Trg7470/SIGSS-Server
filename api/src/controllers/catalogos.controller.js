@@ -1,6 +1,12 @@
 const Catalogos = require('../models/catalogos.model');
 
 class CatalogosController {
+    /**
+     * El parámetro "nombre" funciona como texto de búsqueda libre: se
+     * compara tanto contra el Nombre del diagnóstico como contra su Clave
+     * CIE-10 (ver Catalogos.diagnosticos_nombre), para que sirva igual si
+     * se escribe el nombre o ya se sabe la clave.
+     */
     static async buscar_diagnosticos(req, res) {
         const nombre = req.query.nombre?.trim();
 

@@ -215,8 +215,12 @@ function escribir_celda(xml_hoja, referencia, valor, opciones = {}) {
         `<rPr><b/><sz val="${tamano}"/><color rgb="FF000000"/><rFont val="Arial"/></rPr>`;
     let celda_nueva;
     if (typeof valor === 'number' && !opciones.titulo) {
-        celda_nueva = `<c r="${referencia}"${atributo_estilo} t="inlineStr"><is>` +
-            `<r>${propiedades_valor}<t>${valor}</t></r></is></c>`;
+        // Celda numérica real (sin atributo "t", valor plano en <v>): así
+        // Excel la reconoce como número y no marca la advertencia de
+        // "número guardado como texto". A diferencia del texto, aquí no se
+        // puede forzar la fuente por valor (<rPr>); toma la que traiga el
+        // estilo de la celda.
+        celda_nueva = `<c r="${referencia}"${atributo_estilo}><v>${valor}</v></c>`;
     } else {
         // Etiqueta pequeña y gris (si la celda la trae) + valor destacado.
         const etiqueta = opciones.titulo

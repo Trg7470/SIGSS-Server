@@ -200,6 +200,10 @@ function rellenar_hoja(xml_base, configuracion, contexto, encabezado, registros_
             horizontal: 'center',
             vertical: 'center',
             shrinkToFit: '1',
+            // La celda base de la plantilla trae el texto girado (rotación
+            // vertical); se fuerza a 0 para que día/mes/año se vean
+            // horizontales, sin tocar la plantilla oficial.
+            textRotation: '0',
         });
         xml = U.escribir_celda(xml, `${desde}${cfg_fecha.fila}`, partes[parte], { estilo, tam: 10 });
         xml = U.agregar_combinacion(xml, `${desde}${cfg_fecha.fila}:${hasta}${cfg_fecha.fila}`);

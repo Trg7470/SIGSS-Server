@@ -8,16 +8,14 @@ const RUTAS = require('../../config/rutas');
 const U = require('../../utils/plantilla_xlsx');
 const CONSULTA_EXTERNA_CONFIG = require('../../config/formatos/consulta_externa.config');
 const PLANIFICACION_FAMILIAR_CONFIG = require('../../config/formatos/planificacion_familiar.config');
-const SALUD_BUCAL_CONFIG = require('../../config/formatos/salud_bucal.config');
-const DETECCIONES_CONFIG = require('../../config/formatos/detecciones.config');
+const NOTA_MEDICA_CONFIG = require('../../config/formatos/nota_medica.config');
 
 // Formatos registrados. Para agregar otro basta con crear su archivo de
 // configuración en ./formatos y registrarlo aquí.
 const FORMATOS = {
     [CONSULTA_EXTERNA_CONFIG.id]: CONSULTA_EXTERNA_CONFIG,
     [PLANIFICACION_FAMILIAR_CONFIG.id]: PLANIFICACION_FAMILIAR_CONFIG,
-    [SALUD_BUCAL_CONFIG.id]: SALUD_BUCAL_CONFIG,
-    [DETECCIONES_CONFIG.id]: DETECCIONES_CONFIG,
+    [NOTA_MEDICA_CONFIG.id]: NOTA_MEDICA_CONFIG,
 };
 
 // Límite de seguridad para evitar archivos enormes por un error de consulta.
@@ -97,19 +95,27 @@ function validar_datos(configuracion, datos) {
         throw new Error(`Se excede el máximo de ${MAXIMO_HOJAS} hojas por archivo.`);
     }
 
-    // Encabezado
-    for (const [clave, valor] of Object.entries(encabezado)) {
-        if (clave === 'fecha') {
-            continue;
+    // Encabezado. Algunos formatos (p. ej. nota-medica) no tienen un
+    // encabezado de hoja aparte -- cada registro ya trae todos sus datos --
+    // así que no tienen "configuracion.encabezado" ni "configuracion.fecha"
+    // y se manda "encabezado: {}" desde el llamador. Si no hay
+    // "configuracion.encabezado" no hay nada que validar aquí.
+    if (configuracion.encabezado) {
+        for (const [clave, valor] of Object.entries(encabezado)) {
+            if (clave === 'fecha') {
+                continue;
+            }
+            if (!configuracion.encabezado[clave]) {
+                throw new Error(`El campo de encabezado "${clave}" no existe en el formato.`);
+            }
+            if (!valor_vacio(valor) && !es_valor_escribible(valor)) {
+                throw new Error(`El valor del encabezado "${clave}" no es válido.`);
+            }
         }
-        if (!configuracion.encabezado[clave]) {
-            throw new Error(`El campo de encabezado "${clave}" no existe en el formato.`);
-        }
-        if (!valor_vacio(valor) && !es_valor_escribible(valor)) {
-            throw new Error(`El valor del encabezado "${clave}" no es válido.`);
+        if (configuracion.fecha) {
+            separar_fecha(encabezado.fecha);
         }
     }
-    separar_fecha(encabezado.fecha);
 
     // Consultas
     registros.forEach((registro, indice) => {
@@ -156,82 +162,73 @@ function rellenar_hoja(xml_base, configuracion, contexto, encabezado, registros_
     // debe conservarse junto al valor, igual que en los campos de registros
     // marcados con "titulo": configuracion.encabezado[clave] puede ser un
     // string (celda) o un objeto { celda, titulo: true }.
-    for (const [clave, valor] of Object.entries(encabezado)) {
-        if (clave === 'fecha' || valor_vacio(valor)) {
-            continue;
-        }
-        const campo_encabezado = configuracion.encabezado[clave];
-        const referencia = typeof campo_encabezado === 'string'
-            ? campo_encabezado
-            : campo_encabezado.celda;
-
-        if (typeof campo_encabezado === 'object' && campo_encabezado.titulo) {
-            const celda = U.buscar_celda(xml, referencia);
-            if (!celda) {
-                throw new Error(`La celda ${referencia} (${clave}) no existe en la plantilla.`);
+    // Formatos sin encabezado propio (p. ej. nota-medica, donde cada
+    // registro ya trae todos sus datos) no tienen "configuracion.encabezado"
+    // y se saltan este bloque por completo.
+    if (configuracion.encabezado) {
+        for (const [clave, valor] of Object.entries(encabezado)) {
+            if (clave === 'fecha' || valor_vacio(valor)) {
+                continue;
             }
-            const estilo_actual = U.obtener_estilo_celda(celda[1]);
-            const etiqueta = U.leer_texto_celda(xml, referencia, cadenas);
-            xml = U.escribir_celda(xml, referencia, valor, {
-                titulo: etiqueta,
-                // Solo "wrapText": "shrinkToFit" obliga a Excel a encoger la
-                // letra para que etiqueta y valor entren en una sola línea,
-                // lo que anula el salto de línea ("\n") que escribir_celda
-                // ya pone entre ambos y hace que el valor nunca baje de
-                // renglón (ver el mismo patrón, sin shrinkToFit, abajo en
-                // el bucle de "registros").
-                estilo: estilos.clonar(estilo_actual, { wrapText: '1' }),
-                tam: 9,
-            });
-        } else {
-            xml = U.escribir_celda(xml, referencia, valor, {
-                estilo: estilo_ajustado(xml, referencia),
-                tam: 9,
-            });
+            const campo_encabezado = configuracion.encabezado[clave];
+            const referencia = typeof campo_encabezado === 'string'
+                ? campo_encabezado
+                : campo_encabezado.celda;
+
+            if (typeof campo_encabezado === 'object' && campo_encabezado.titulo) {
+                const celda = U.buscar_celda(xml, referencia);
+                if (!celda) {
+                    throw new Error(`La celda ${referencia} (${clave}) no existe en la plantilla.`);
+                }
+                const estilo_actual = U.obtener_estilo_celda(celda[1]);
+                const etiqueta = U.leer_texto_celda(xml, referencia, cadenas);
+                xml = U.escribir_celda(xml, referencia, valor, {
+                    titulo: etiqueta,
+                    // Solo "wrapText": "shrinkToFit" obliga a Excel a encoger la
+                    // letra para que etiqueta y valor entren en una sola línea,
+                    // lo que anula el salto de línea ("\n") que escribir_celda
+                    // ya pone entre ambos y hace que el valor nunca baje de
+                    // renglón (ver el mismo patrón, sin shrinkToFit, abajo en
+                    // el bucle de "registros").
+                    estilo: estilos.clonar(estilo_actual, { wrapText: '1' }),
+                    tam: 9,
+                });
+            } else {
+                xml = U.escribir_celda(xml, referencia, valor, {
+                    estilo: estilo_ajustado(xml, referencia),
+                    tam: 9,
+                });
+            }
         }
     }
 
     // Fecha: tres recuadros (día, mes, año) en la parte superior derecha.
-    const { fecha: cfg_fecha } = configuracion;
-    const partes = separar_fecha(encabezado.fecha);
-    for (const parte of ['dia', 'mes', 'anio']) {
-        const [desde, hasta] = cfg_fecha[parte].rango;
-        const estilo = estilos.clonar(cfg_fecha.estilo_base, {
-            horizontal: 'center',
-            vertical: 'center',
-            shrinkToFit: '1',
-            // La celda base de la plantilla trae el texto girado (rotación
-            // vertical); se fuerza a 0 para que día/mes/año se vean
-            // horizontales, sin tocar la plantilla oficial.
-            textRotation: '0',
-        });
-        xml = U.escribir_celda(xml, `${desde}${cfg_fecha.fila}`, partes[parte], { estilo, tam: 10 });
-        xml = U.agregar_combinacion(xml, `${desde}${cfg_fecha.fila}:${hasta}${cfg_fecha.fila}`);
+    // Solo los formatos que la dibujan así (consulta-externa,
+    // planificacion-familiar) tienen "configuracion.fecha"; nota-medica
+    // escribe su fecha como texto normal dentro de "registros.campos".
+    if (configuracion.fecha) {
+        const { fecha: cfg_fecha } = configuracion;
+        const partes = separar_fecha(encabezado.fecha);
+        for (const parte of ['dia', 'mes', 'anio']) {
+            const [desde, hasta] = cfg_fecha[parte].rango;
+            const estilo = estilos.clonar(cfg_fecha.estilo_base, {
+                horizontal: 'center',
+                vertical: 'center',
+                shrinkToFit: '1',
+            });
+            xml = U.escribir_celda(xml, `${desde}${cfg_fecha.fila}`, partes[parte], { estilo, tam: 10 });
+            xml = U.agregar_combinacion(xml, `${desde}${cfg_fecha.fila}:${hasta}${cfg_fecha.fila}`);
+        }
     }
 
     // Consultas
     const { fila_inicial, altura_bloque, campos } = configuracion.registros;
     registros_hoja.forEach((registro, indice) => {
         for (const [clave, valor] of Object.entries(registro)) {
-            const { col, fila, titulo, desborda, centrado, limpiar_si_vacio } = campos[clave];
             if (valor_vacio(valor)) {
-                if (!limpiar_si_vacio) {
-                    continue;
-                }
-                // Algunas plantillas oficiales traen el numerito de la
-                // pregunta del instructivo impreso dentro de la propia
-                // celda de datos (no solo en la fila de leyenda). No se
-                // modifica la plantilla: aquí se sobrescribe esa celda con
-                // un valor vacío únicamente en el archivo generado, para
-                // que no se confunda con un dato capturado.
-                const referencia_vacia = `${col}${fila_inicial + indice * altura_bloque + fila}`;
-                const celda_vacia = U.buscar_celda(xml, referencia_vacia);
-                if (celda_vacia) {
-                    const estilo_vacio = U.obtener_estilo_celda(celda_vacia[1]);
-                    xml = U.escribir_celda(xml, referencia_vacia, '', { estilo: estilo_vacio });
-                }
                 continue;
             }
+            const { col, fila, titulo, desborda, centrado } = campos[clave];
             const referencia = `${col}${fila_inicial + indice * altura_bloque + fila}`;
             const celda = U.buscar_celda(xml, referencia);
             if (!celda) {

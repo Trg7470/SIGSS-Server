@@ -2,16 +2,10 @@ const fs = require('fs/promises');
 const { exportar_formato } = require('../services/documentos/exportar_formato.service');
 const { consultar_formato } = require('../services/documentos/consultar_formato.service');
 
-/**
- * Genera un documento Excel o PDF y lo entrega al navegador.
- * Limpia los archivos temporales después de la transferencia.
- */
 async function exportar_documento(req, res) {
     let archivo;
 
     try {
-        // Ruta GET: todo viene por query string, nunca por body. Se usan
-        // los mismos nombres que ya manda el cliente (snake_case).
         const { formato, tipo_salida, id_consulta, fecha, clues, nombre_archivo } = req.query || {};
 
         if (
@@ -25,9 +19,6 @@ async function exportar_documento(req, res) {
             });
         }
 
-        // El backend arma "datos" (encabezado + registros) consultando la
-        // vista del módulo: por una sola consulta (botón de la fila del
-        // historial) o por el día completo (hoja SINBA-SIS).
         const datos = await consultar_formato(formato.trim(), {
             id_consulta,
             fecha,
@@ -50,7 +41,6 @@ async function exportar_documento(req, res) {
             );
         }
 
-        // Incluir todos los archivos temporales que deban eliminarse.
         const archivosTemporales = [
             ...new Set(
                 Array.isArray(archivo.archivos_temporales)
@@ -63,7 +53,6 @@ async function exportar_documento(req, res) {
             archivo.ruta_archivo,
             archivo.nombre_descarga,
             async (error) => {
-                // Eliminar los temporales tras finalizar la transferencia.
                 const resultados = await Promise.allSettled(
                     archivosTemporales.map((ruta) => fs.unlink(ruta))
                 );
@@ -92,8 +81,6 @@ async function exportar_documento(req, res) {
                                 'No fue posible entregar el documento descargable.',
                         });
                     }
-
-                    // La respuesta ya comenzó: no enviar un segundo JSON.
                     if (!res.destroyed) {
                         res.destroy(error);
                     }

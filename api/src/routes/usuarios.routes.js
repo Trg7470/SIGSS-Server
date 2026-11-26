@@ -1,67 +1,14 @@
 const express = require('express');
-
-const UsuariosController =
-    require('../controllers/usuarios.controller');
-
-const {
-    verificarToken
-} = require('../middleware/auth.middleware');
-
 const router = express.Router();
+const usuarios_controller = require('../controllers/usuarios.controller');
+const { verificarToken, verificarRol } = require('../middleware/auth.middleware');
 
-// Consultas
-router.get(
-    '/',
-    verificarToken,
-    UsuariosController.listar
-);
+router.get('/', verificarToken, verificarRol(3), usuarios_controller.listar);
+router.get('/generar-contrasena', verificarToken, verificarRol(3), usuarios_controller.generar_contrasena);
+router.get('/:id', verificarToken, verificarRol(3), usuarios_controller.obtener_por_id);
+router.post('/', verificarToken, verificarRol(3), usuarios_controller.crear);
+router.put('/:id', verificarToken, verificarRol(3), usuarios_controller.actualizar);
+router.patch('/:id/estado', verificarToken, verificarRol(3), usuarios_controller.cambiar_estado);
+router.patch('/:id/contrasena', verificarToken, verificarRol(3), usuarios_controller.cambiar_contrasena);
 
-router.get(
-    '/resume',
-    verificarToken,
-    UsuariosController.resumen
-);
-
-router.get(
-    '/generate-password',
-    verificarToken,
-    UsuariosController.generarPassword
-);
-
-router.get(
-    '/:id',
-    verificarToken,
-    UsuariosController.obtenerPorId
-);
-
-// Recuperación de contraseña
-router.post(
-    '/reset/check',
-    UsuariosController.verificarUsuario
-);
-
-router.post(
-    '/reset/newPassword',
-    UsuariosController.restablecerPassword
-);
-
-// Operaciones
-router.post(
-    '/',
-    verificarToken,
-    UsuariosController.crear
-);
-
-router.put(
-    '/:id',
-    verificarToken,
-    UsuariosController.actualizar
-);
-
-router.patch(
-    '/:id/estado',
-    verificarToken,
-    UsuariosController.cambiarEstado
-);
-
-module.exports = router;
+module.exports = router;    

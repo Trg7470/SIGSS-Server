@@ -163,6 +163,8 @@ module.exports = {
     cancer_cervicouterino_realizado: { columna: 'cancer_cervicouterino_realizado', catalogo: 'cancer_cervicouterino' },
     cancer_cervicouterino_resultado: { columna: 'cancer_cervicouterino_resultado', catalogo: 'resultado_deteccion' },
     exploracion_cancer_mama_id: { columna: 'exploracion_cancer_mama_id', catalogo: 'exploracion_cancer_mama' },
+    // Violencia Sexual y Violencia Mujeres 15+ son ambas un resultado de
+    // detección (pregunta 7: 0.Positivo, 1.Negativo), confirmado con Ileana.
     violencia_sexual: { columna: 'violencia_sexual', catalogo: 'resultado_deteccion' },
     violencia_mujeres_15_anos: { columna: 'violencia_mujeres_15_anos', catalogo: 'resultado_deteccion' },
     sindrome_turner: { columna: 'sindrome_turner', catalogo: 'resultado_deteccion' },
@@ -173,19 +175,13 @@ module.exports = {
 
     // --- TB / espirometría ---
     probable_tb_estudio: { columna: 'probable_tb_estudio', catalogo: 'respuesta_tamizaje' },
-    // VEF1 y CVF comparten una sola celda combinada en la plantilla.
-    espirometria_vef1_cvf: {
-        calcular: (fila) => {
-            const partes = [];
-            if (fila.espirometria_vef1 !== null && fila.espirometria_vef1 !== undefined) {
-                partes.push(`VEF1: ${fila.espirometria_vef1}`);
-            }
-            if (fila.espirometria_cvf !== null && fila.espirometria_cvf !== undefined) {
-                partes.push(`CVF: ${fila.espirometria_cvf}`);
-            }
-            return partes.length ? partes.join(' / ') : undefined;
-        },
-    },
+    // El formato oficial no trae una celda de VEF1 y otra de CVF: trae una
+    // sola casilla "VEF1/CVF" que registra la razón (relación) como un solo
+    // valor decimal (confirmado contra el instructivo y la plantilla
+    // SINBA-SIS-DET-P_2026.xlsx). Por eso en la BD ahora es una sola
+    // columna (Espirometria_VEF1_CVF, DECIMAL) y aquí es passthrough
+    // directo, igual que espirometria_lin.
+    espirometria_vef1_cvf: { columna: 'espirometria_vef1_cvf' },
     espirometria_lin: { columna: 'espirometria_lin' },
     espirometria_resultado_id: { columna: 'espirometria_resultado_id' },
 

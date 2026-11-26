@@ -44,7 +44,7 @@ const limpia_si_vacio = { limpiar_si_vacio: true };
 
 module.exports = {
     id: 'detecciones',
-    plantilla: 'SINBA-SIS-DET-P_2026.xlsx',
+    plantilla: 'SINBA-SIS-DET-P-2026.xlsx',
     hoja: 'ANVERSO', // nombre real de la pestaña dentro del archivo
 
     // Datos del encabezado: ver filas 5-6 de la plantilla.
@@ -61,13 +61,13 @@ module.exports = {
 
     // El recuadro de FECHA está dibujado (forma, no celdas) sobre las
     // columnas BM-BY, filas 3-5 — mismo mecanismo que salud bucal, solo
-    // que aquí el dibujo empieza más a la derecha. BO, BS y BX están
+    // que aquí el dibujo empieza más a la derecha. BR, BU y BX están
     // vacías en la fila 3 y suficientemente separadas entre sí para que
     // el desborde de cada valor no choque con el de al lado.
     fecha: {
         fila: 3,
-        dia: { rango: ['BO', 'BO'] },
-        mes: { rango: ['BS', 'BS'] },
+        dia: { rango: ['BR', 'BR'] },
+        mes: { rango: ['BU', 'BU'] },
         anio: { rango: ['BX', 'BX'] },
         estilo_base: 12,
         // Igual que en salud bucal: estas columnas tienen anchos distintos

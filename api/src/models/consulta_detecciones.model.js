@@ -29,9 +29,9 @@ class ConsultaDetecciones {
                  Violencia_Sexual, Violencia_Mujeres_15_Anos, Sindrome_Turner,
                  Hiperplasia_Prostatica, Reactivos_Antigeno_Prostatico,
                  Probable_TB_Estudio, Cancer_Cervicouterino_Realizado,
-                 Cancer_Cervicouterino_Resultado, Espirometria_VEF1,
-                 Espirometria_CVF, Espirometria_LIN)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                 Cancer_Cervicouterino_Resultado, Espirometria_VEF1_CVF,
+                 Espirometria_LIN)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 Id_Consulta,
                 ids.Id_Cat_Espirometria_Resultados,
@@ -55,8 +55,11 @@ class ConsultaDetecciones {
                 campos.Probable_TB_Estudio,
                 campos.Cancer_Cervicouterino_Realizado,
                 campos.Cancer_Cervicouterino_Resultado,
-                campos.Espirometria_VEF1,
-                campos.Espirometria_CVF,
+                // Antes eran 2 columnas (Espirometria_VEF1, Espirometria_CVF);
+                // el formato oficial solo trae una sola casilla "VEF1/CVF"
+                // (la razón, un decimal), así que ahora es una sola columna.
+                // Ver migracion_espirometria.sql.
+                campos.Espirometria_VEF1_CVF,
                 campos.Espirometria_LIN,
             ]
         );

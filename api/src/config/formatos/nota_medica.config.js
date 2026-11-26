@@ -22,14 +22,7 @@ module.exports = {
             nombre_unidad: campo('I', 2),
             expediente: campo('Q', 2),
             folio_receta: campo('C', 3),
-            // La fecha está dibujada como tres recuadros (día, mes, año) en la fila 3.
-            fecha: {
-                fila: 3,
-                dia: { rango: ['AY', 'BA'] },
-                mes: { rango: ['BC', 'BE'] },
-                anio: { rango: ['BG', 'BH'] },
-                estilo_base: 12,
-            },          // texto "DD/MM/AAAA", no usa el recuadro de SINBA
+            fecha: campo('I', 3),               // texto "DD/MM/AAAA", no usa el recuadro de SINBA
             hora: campo('O', 3),                // no se captura hoy en Registrar Consulta (ver nota)
 
             // Ficha de identificación del paciente

@@ -128,6 +128,8 @@ class Usuarios {
             `UPDATE Usuarios SET Ultimo_Acceso = NOW() WHERE Id_Usuario = ?`,
             [id_usuario]
         );
+
+        return { success: true };
     }
 }
 

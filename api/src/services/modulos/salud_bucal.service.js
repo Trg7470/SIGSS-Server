@@ -165,21 +165,26 @@ class SaludBucalService {
         );
         const total = filas_total[0].total;
 
+        // id_nota_medica viene de un LEFT JOIN aparte (no de vista_salud_bucal,
+        // que no sabe nada de Notas_Medicas): NULL si esta consulta todavía no
+        // tiene una, para que el frontend sepa si mostrar el botón o no.
         const [registros] = await mysqlPool.query(
             `SELECT
-                id_consulta,
-                folio_receta,
-                expediente,
-                fecha,
-                nombre,
-                nombre_paciente,
-                apellido_paterno,
-                apellido_materno,
-                curp
-             FROM vista_salud_bucal
-             WHERE fecha BETWEEN ? AND ?
+                vsb.id_consulta,
+                vsb.folio_receta,
+                vsb.expediente,
+                vsb.fecha,
+                vsb.nombre,
+                vsb.nombre_paciente,
+                vsb.apellido_paterno,
+                vsb.apellido_materno,
+                vsb.curp,
+                nm.Id_Nota_Medica AS id_nota_medica
+             FROM vista_salud_bucal vsb
+             LEFT JOIN Notas_Medicas nm ON nm.Consultas_Id_Consulta = vsb.id_consulta
+             WHERE vsb.fecha BETWEEN ? AND ?
              ${filtro_busqueda_sql}
-             ORDER BY fecha DESC, id_consulta DESC
+             ORDER BY vsb.fecha DESC, vsb.id_consulta DESC
              LIMIT ? OFFSET ?`,
             [fecha_inicial, fecha_final, ...parametros_busqueda, limite_seguro, offset]
         );

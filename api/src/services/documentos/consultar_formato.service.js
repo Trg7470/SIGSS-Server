@@ -6,18 +6,21 @@ const CONSULTA_EXTERNA_MAPEO = require('./formatos/consulta_externa.mapeo');
 const PLANIFICACION_FAMILIAR_MAPEO = require('./formatos/planificacion_familiar.mapeo');
 const SALUD_BUCAL_MAPEO = require('./formatos/salud_bucal.mapeo');
 const DETECCIONES_MAPEO = require('./formatos/detecciones.mapeo');
+const NOTA_MEDICA_MAPEO = require('./formatos/nota_medica.mapeo');
 
 const MAPEOS = {
     'consulta-externa': CONSULTA_EXTERNA_MAPEO,
     'planificacion-familiar': PLANIFICACION_FAMILIAR_MAPEO,
     'salud-bucal': SALUD_BUCAL_MAPEO,
     'detecciones': DETECCIONES_MAPEO,
+    'nota-medica': NOTA_MEDICA_MAPEO,
 };
 const VISTAS = {
     'consulta-externa': 'vista_consulta_externa',
     'planificacion-familiar': 'vista_planificacion_familiar',
     'salud-bucal': 'vista_salud_bucal',
     'detecciones': 'vista_detecciones',
+    'nota-medica': 'vista_nota_medica',
 };
 
 function resolver_campo(origen, fila) {

@@ -55,11 +55,19 @@ function celda_vacia(referencia, estilo) {
  * @param {Object} metadatos    { nombre_unidad, clues, servicio, responsable, mes, anio }
  * @param {string} titulo_modulo
  */
+const ANCHO_COL_A = 55;
+const ANCHO_COL_B = 45;
+
 function construir_hoja(filas, valores, metadatos, titulo_modulo) {
     const filas_xml = [];
     const combinaciones = [];
 
-    // --- Fila 1: título + logos (los logos van en el <drawing>, no aquí) ---
+    // Solo 2 columnas reales (A = etiqueta/variable, B = valor/total), bien
+    // anchas. Los logos no viven en columnas aparte: flotan encima de los
+    // bordes izquierdo/derecho de la fila 1 (ver construir_drawing), como
+    // un membrete sobre el mismo recuadro del título.
+
+    // --- Fila 1: título (los logos van en el <drawing>, no aquí) ---
     filas_xml.push(
         `<row r="1" ht="32" customHeight="1">` +
         celda_texto('A1', 'INFORME MENSUAL DE ACTIVIDADES', 2) +
@@ -69,20 +77,25 @@ function construir_hoja(filas, valores, metadatos, titulo_modulo) {
     combinaciones.push('A1:B1');
 
     // --- Fila 2: módulo ---
-    filas_xml.push(`<row r="2">${celda_texto('A2', `Módulo: ${titulo_modulo}`, 4)}${celda_vacia('B2', 0)}</row>`);
+    filas_xml.push(
+        `<row r="2">` +
+        celda_texto('A2', `Módulo: ${titulo_modulo}`, 4) +
+        celda_vacia('B2', 4) +
+        `</row>`
+    );
     combinaciones.push('A2:B2');
 
-    // --- Filas 3-8: datos de identificación (etiqueta en A, valor en B) ---
+    // --- Filas 3+: datos de identificación (etiqueta en A, valor en B) ---
     const campos_identificacion = [
         ['Nombre de la unidad:', metadatos.nombre_unidad],
         ['CLUES:', metadatos.clues],
-        ['Servicio:', metadatos.servicio],
         ['Nombre de la persona responsable:', metadatos.responsable],
-        ['Mes:', metadatos.mes],
+        ['Mes:', metadatos.mes_nombre],
         ['Año:', metadatos.anio],
     ];
+    const PRIMERA_FILA_IDENTIFICACION = 3;
     campos_identificacion.forEach(([etiqueta, valor], indice) => {
-        const fila = indice + 3;
+        const fila = PRIMERA_FILA_IDENTIFICACION + indice;
         filas_xml.push(
             `<row r="${fila}">` +
             celda_texto(`A${fila}`, etiqueta, 5) +
@@ -91,14 +104,17 @@ function construir_hoja(filas, valores, metadatos, titulo_modulo) {
         );
     });
 
-    // --- Fila 9: separador ---
-    filas_xml.push(`<row r="9">${celda_vacia('A9', 0)}${celda_vacia('B9', 0)}</row>`);
+    // --- Fila siguiente: separador ---
+    const fila_separador = PRIMERA_FILA_IDENTIFICACION + campos_identificacion.length;
+    filas_xml.push(`<row r="${fila_separador}">${celda_vacia(`A${fila_separador}`, 0)}${celda_vacia(`B${fila_separador}`, 0)}</row>`);
 
-    // --- Fila 10: encabezado de tabla ---
-    filas_xml.push(`<row r="10">${celda_texto('A10', 'Variable', 7)}${celda_texto('B10', 'Total', 7)}</row>`);
+    // --- Fila siguiente: encabezado de tabla ---
+    const fila_encabezado_tabla = fila_separador + 1;
+    filas_xml.push(`<row r="${fila_encabezado_tabla}">${celda_texto(`A${fila_encabezado_tabla}`, 'Variable', 7)}${celda_texto(`B${fila_encabezado_tabla}`, 'Total', 7)}</row>`);
 
-    // --- Filas 11+: secciones / subsecciones / variables ---
-    let fila_actual = 11;
+    // --- Filas siguientes: secciones / subsecciones / variables ---
+    let fila_actual = fila_encabezado_tabla + 1;
+    const primera_fila_datos = fila_actual;
     for (const definicion of filas) {
         if (definicion.tipo === 'seccion') {
             filas_xml.push(`<row r="${fila_actual}">${celda_texto(`A${fila_actual}`, definicion.texto, 8)}${celda_vacia(`B${fila_actual}`, 8)}</row>`);
@@ -126,15 +142,13 @@ function construir_hoja(filas, valores, metadatos, titulo_modulo) {
 <dimension ref="A1:B${ultima_fila}"/>
 <sheetViews>
 <sheetView workbookViewId="0">
-<pane ySplit="10" topLeftCell="A11" activePane="bottomLeft" state="frozen"/>
-<selection pane="bottomLeft" activeCell="A11" sqref="A11"/>
+<pane ySplit="${fila_encabezado_tabla}" topLeftCell="A${primera_fila_datos}" activePane="bottomLeft" state="frozen"/>
+<selection pane="bottomLeft" activeCell="A${primera_fila_datos}" sqref="A${primera_fila_datos}"/>
 </sheetView>
 </sheetViews>
 <cols>
-<col min="1" max="1" width="52"/>
-<col min="2" max="2" width="16"/>
-<col min="3" max="3" width="2"/>
-<col min="4" max="5" width="11"/>
+<col min="1" max="1" width="${ANCHO_COL_A}"/>
+<col min="2" max="2" width="${ANCHO_COL_B}"/>
 </cols>
 <sheetData>${filas_xml.join('')}</sheetData>
 <mergeCells count="${combinaciones.length}">${combinaciones.map((ref) => `<mergeCell ref="${ref}"/>`).join('')}</mergeCells>
@@ -189,14 +203,33 @@ const DRAWING_RELS = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="../media/image2.jpg"/>
 </Relationships>`;
 
+// Aproximación estándar de Excel para pasar un ancho de columna (en
+// "caracteres") a píxeles, con fuente por defecto Calibri 11.
+function ancho_columna_a_px(ancho_caracteres) {
+    return Math.round(ancho_caracteres * 7 + 5);
+}
+
 function construir_drawing(ancho_logo_izq_px, ancho_logo_der_px) {
     const cy = ALTO_LOGO_PX * PX_A_EMU;
     const cx_izq = Math.round(ancho_logo_izq_px * PX_A_EMU);
     const cx_der = Math.round(ancho_logo_der_px * PX_A_EMU);
+
+    // Margen interno (en px) para que el logo no quede pegado al borde.
+    const MARGEN_PX = 4;
+    const colOff_izq = MARGEN_PX * PX_A_EMU;
+
+    // El logo derecho se ancla dentro de la columna B, pegado a SU borde
+    // derecho (no a una columna aparte), para que solo se vean 2 columnas.
+    const ancho_col_b_px = ancho_columna_a_px(ANCHO_COL_B);
+    const colOff_der_px = Math.max(ancho_col_b_px - ancho_logo_der_px - MARGEN_PX, MARGEN_PX);
+    const colOff_der = Math.round(colOff_der_px * PX_A_EMU);
+
+    const rowOff = MARGEN_PX * PX_A_EMU;
+
     return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xdr:wsDr xmlns:xdr="http://schemas.openxmlformats.org/drawingml/2006/spreadsheetDrawing" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <xdr:oneCellAnchor>
-<xdr:from><xdr:col>3</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
+<xdr:from><xdr:col>0</xdr:col><xdr:colOff>${colOff_izq}</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>${rowOff}</xdr:rowOff></xdr:from>
 <xdr:ext cx="${cx_izq}" cy="${cy}"/>
 <xdr:pic>
 <xdr:nvPicPr><xdr:cNvPr id="1" name="Logo SIGSS"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>
@@ -206,7 +239,7 @@ function construir_drawing(ancho_logo_izq_px, ancho_logo_der_px) {
 <xdr:clientData/>
 </xdr:oneCellAnchor>
 <xdr:oneCellAnchor>
-<xdr:from><xdr:col>4</xdr:col><xdr:colOff>0</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>0</xdr:rowOff></xdr:from>
+<xdr:from><xdr:col>1</xdr:col><xdr:colOff>${colOff_der}</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>${rowOff}</xdr:rowOff></xdr:from>
 <xdr:ext cx="${cx_der}" cy="${cy}"/>
 <xdr:pic>
 <xdr:nvPicPr><xdr:cNvPr id="2" name="Logo Servicios de Salud Durango"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>
@@ -223,7 +256,7 @@ const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <fonts count="7">
 <font><sz val="11"/><name val="Calibri"/></font>
 <font><sz val="10"/><name val="Arial"/></font>
-<font><b/><sz val="13"/><color rgb="FFFFFFFF"/><name val="Arial"/></font>
+<font><b/><sz val="13"/><name val="Arial"/></font>
 <font><b/><i/><sz val="11"/><name val="Arial"/></font>
 <font><b/><sz val="10"/><name val="Arial"/></font>
 <font><b/><sz val="10"/><color rgb="FF000000"/><name val="Arial"/></font>
@@ -231,7 +264,7 @@ const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </fonts>
 <fills count="6">
 <fill><patternFill patternType="none"/></fill>
-<fill><patternFill patternType="solid"><fgColor rgb="FF1F4E78"/><bgColor indexed="64"/></patternFill></fill>
+<fill><patternFill patternType="gray125"/></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFFFFF00"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFD9D9D9"/><bgColor indexed="64"/></patternFill></fill>
 <fill><patternFill patternType="solid"><fgColor rgb="FFBDD7EE"/><bgColor indexed="64"/></patternFill></fill>
@@ -245,12 +278,12 @@ const STYLES = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cellXfs count="12">
 <xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
 <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>
-<xf numFmtId="0" fontId="2" fillId="1" borderId="0" xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+<xf numFmtId="0" fontId="2" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
 <xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/>
-<xf numFmtId="0" fontId="3" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+<xf numFmtId="0" fontId="3" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
 <xf numFmtId="0" fontId="4" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/>
-<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
-<xf numFmtId="0" fontId="5" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
+<xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1" applyAlignment="1"><alignment vertical="top" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="5" fillId="1" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
 <xf numFmtId="0" fontId="5" fillId="4" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
 <xf numFmtId="0" fontId="6" fillId="5" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1"/>
 <xf numFmtId="0" fontId="1" fillId="0" borderId="1" xfId="0" applyFont="1" applyBorder="1"/>

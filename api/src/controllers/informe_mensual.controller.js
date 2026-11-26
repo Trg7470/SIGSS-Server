@@ -13,7 +13,7 @@ const { generar_xls_informe_mensual, MODULOS } = require('../services/documentos
 class InformeMensualController {
     static async exportar(req, res) {
         try {
-            const { modulo, mes, anio, id_unidad } = req.query;
+            const { modulo, mes, anio, id_unidad, responsable } = req.query;
 
             if (!modulo || !MODULOS[modulo]) {
                 return res.status(400).json({
@@ -55,6 +55,10 @@ class InformeMensualController {
                 mes_nombre: NOMBRES_MES[mesNum - 1],
                 mes: mesNum,
                 anio: anioNum,
+                // El nombre del responsable viene del usuario guardado en
+                // sessionStorage en el navegador (no hay sesión de usuario
+                // en el servidor), así que llega ya armado desde el front.
+                responsable: responsable || '',
             };
 
             const { ruta_archivo } = await generar_xls_informe_mensual(modulo, valores, metadatos);

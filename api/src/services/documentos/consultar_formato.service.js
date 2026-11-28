@@ -1,3 +1,4 @@
+
 'use strict';
 
 const { mysqlPool } = require('../../config/mysql');
@@ -15,6 +16,7 @@ const MAPEOS = {
     'detecciones': DETECCIONES_MAPEO,
     'nota-medica': NOTA_MEDICA_MAPEO,
 };
+
 const VISTAS = {
     'consulta-externa': 'vista_consulta_externa',
     'planificacion-familiar': 'vista_planificacion_familiar',
@@ -27,11 +29,14 @@ function resolver_campo(origen, fila) {
     if (typeof origen.calcular === 'function') {
         return origen.calcular(fila);
     }
+
     const valor_crudo = fila[origen.columna];
+
     if (origen.booleano) {
         if (valor_crudo === null || valor_crudo === undefined) return undefined;
         return Number(valor_crudo) ? 'Si' : 'No';
     }
+
     return origen.catalogo
         ? resolver_catalogo(origen.catalogo, valor_crudo)
         : valor_crudo;
@@ -39,15 +44,18 @@ function resolver_campo(origen, fila) {
 
 function mapear_fila(mapeo, fila) {
     const registro = {};
+
     for (const [llave_plantilla, origen] of Object.entries(mapeo)) {
         registro[llave_plantilla] = resolver_campo(origen, fila);
     }
+
     return registro;
 }
 
 async function consultar_formato(id_formato, parametros) {
     const mapeo = MAPEOS[id_formato];
     const vista = VISTAS[id_formato];
+
     if (!mapeo || !vista) {
         throw new Error(`No hay mapeo de consulta para "${id_formato}".`);
     }
@@ -55,19 +63,19 @@ async function consultar_formato(id_formato, parametros) {
     const condiciones = [];
     const valores = [];
 
-    // Dos modos: una consulta puntual (para exportar "solo esta fila" desde
-    // el historial) o el día completo (hoja con hasta 5 bloques, como ya se
-    // usaba). Si se da id_consulta, gana sobre fecha.
-        if (parametros && parametros.id_consulta) {
+    // Consulta individual o por fecha.
+    if (parametros && parametros.id_consulta) {
         condiciones.push('id_consulta = ?');
         valores.push(parametros.id_consulta);
     } else if (parametros && parametros.fecha) {
         condiciones.push('fecha >= ? AND fecha < DATE_ADD(?, INTERVAL 1 DAY)');
         valores.push(parametros.fecha, parametros.fecha);
+
         if (parametros.clues) {
             condiciones.push('clues = ?');
             valores.push(parametros.clues);
         }
+
         if (parametros.prestador) {
             condiciones.push('curp_prestador = ?');
             valores.push(parametros.prestador);
@@ -90,6 +98,17 @@ async function consultar_formato(id_formato, parametros) {
     }
 
     const primera = filas[0];
+
+    let registros = filas.map((fila) => mapear_fila(mapeo, fila));
+
+    // Duplicar cada nota médica para generar ORIGINAL y COPIA.
+    if (id_formato === 'nota-medica') {
+        registros = registros.flatMap((registro) => [
+            registro,
+            { ...registro },
+        ]);
+    }
+
     return {
         encabezado: {
             clues: primera.clues,
@@ -98,11 +117,9 @@ async function consultar_formato(id_formato, parametros) {
             nombre_prestador: primera.nombre_prestador,
             tipo_personal: primera.tipo_personal,
             cedula_profesional: primera.cedula_profesional,
-            // Si se consultó por id_consulta no se recibió "fecha" en los
-            // parámetros; se usa la de la propia fila encontrada.
             fecha: parametros.fecha || primera.fecha,
         },
-        registros: filas.map((fila) => mapear_fila(mapeo, fila)),
+        registros,
     };
 }
 

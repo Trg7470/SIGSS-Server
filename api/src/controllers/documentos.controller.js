@@ -6,7 +6,7 @@ async function exportar_documento(req, res) {
     let archivo;
 
     try {
-        const { formato, tipo_salida, id_consulta, fecha, clues, nombre_archivo } = req.query || {};
+        const { formato, tipo_salida, id_consulta, fecha, clues, prestador, nombre_archivo } = req.query || {};
 
         if (
             typeof formato !== 'string' ||
@@ -23,6 +23,7 @@ async function exportar_documento(req, res) {
             id_consulta,
             fecha,
             clues,
+            prestador,
         });
 
         archivo = await exportar_formato(

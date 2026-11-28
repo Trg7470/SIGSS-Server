@@ -58,7 +58,7 @@ async function consultar_formato(id_formato, parametros) {
     // Dos modos: una consulta puntual (para exportar "solo esta fila" desde
     // el historial) o el día completo (hoja con hasta 5 bloques, como ya se
     // usaba). Si se da id_consulta, gana sobre fecha.
-    if (parametros && parametros.id_consulta) {
+        if (parametros && parametros.id_consulta) {
         condiciones.push('id_consulta = ?');
         valores.push(parametros.id_consulta);
     } else if (parametros && parametros.fecha) {
@@ -67,6 +67,10 @@ async function consultar_formato(id_formato, parametros) {
         if (parametros.clues) {
             condiciones.push('clues = ?');
             valores.push(parametros.clues);
+        }
+        if (parametros.prestador) {
+            condiciones.push('curp_prestador = ?');
+            valores.push(parametros.prestador);
         }
     } else {
         throw new Error('Debe especificar la fecha o el id_consulta a consultar.');

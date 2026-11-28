@@ -15,6 +15,18 @@ class PrestadoresController {
             )
         }
     }
+
+    static async listar(req, res) {
+    try {
+        const result = await Prestadores.listar();
+        res.json(result);
+    } catch (error) {
+        res.status(500).json({
+            mensaje: "Error al listar prestadores",
+            error: error.message
+        });
+    }
+}
 }
 
 module.exports = PrestadoresController;

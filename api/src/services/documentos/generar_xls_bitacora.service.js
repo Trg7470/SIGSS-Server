@@ -10,8 +10,9 @@ const { escapar_xml } = require('../../utils/plantilla_xlsx');
 const LOGO_IZQUIERDO = 'Logo_SIGSS.jpeg';
 const LOGO_DERECHO = 'SSD_Servicios_Durango_Azul.jpeg';
 
-const COLUMNAS = ['Fecha y hora', 'Usuario', 'Módulo', 'Acción', 'Tabla afectada'];
-const LETRAS = ['A', 'B', 'C', 'D', 'E'];
+const COLUMNAS = ['Fecha y hora', 'Usuario', 'Módulo', 'Acción', 'Tabla afectada', 'ID afectado'];
+const LETRAS = ['A', 'B', 'C', 'D', 'E', 'F'];
+const ULTIMA_COLUMNA = LETRAS[LETRAS.length - 1];
 
 function fecha_a_serial_excel(fecha) {
     const dias = Date.UTC(fecha.getFullYear(), fecha.getMonth(), fecha.getDate()) / 86400000
@@ -54,10 +55,11 @@ function construir_hoja(registros, metadatos) {
         celda_texto('B1', 'Registro de actividades del sistema (Bitácora)', 2) +
         celda_vacia('C1', 2) +
         celda_vacia('D1', 2) +
-        celda_vacia('E1', 3) +
+        celda_vacia('E1', 2) +
+        celda_vacia('F1', 3) +
         `</row>`
     );
-    combinaciones.push('B1:D1');
+    combinaciones.push('B1:E1');
 
     const lineas_meta = [
         `Rango de fechas: ${formatear_fecha_corta(metadatos.fecha_inicio)} - ${formatear_fecha_corta(metadatos.fecha_fin)}`,
@@ -68,7 +70,7 @@ function construir_hoja(registros, metadatos) {
     lineas_meta.forEach((texto, indice) => {
         const fila = indice + 2;
         filas_xml.push(`<row r="${fila}">${celda_texto(`A${fila}`, texto, 1)}${LETRAS.slice(1).map((col) => celda_vacia(`${col}${fila}`, 0)).join('')}</row>`);
-        combinaciones.push(`A${fila}:E${fila}`);
+        combinaciones.push(`A${fila}:${ULTIMA_COLUMNA}${fila}`);
     });
 
     filas_xml.push(`<row r="6">${LETRAS.map((col) => celda_vacia(`${col}6`, 0)).join('')}</row>`);
@@ -86,16 +88,17 @@ function construir_hoja(registros, metadatos) {
             celda_texto(`C${fila}`, registro.Modulo, 6) +
             celda_texto(`D${fila}`, registro.Accion, 6) +
             celda_texto(`E${fila}`, registro.Tabla_Afectada ?? '', 6) +
+            celda_texto(`F${fila}`, registro.Id_Registro_Afectado ?? '', 6) +
             `</row>`
         );
     });
 
     const ultima_fila = registros.length + 7;
 
-return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>
-<dimension ref="A1:E${ultima_fila}"/>
+<dimension ref="A1:${ULTIMA_COLUMNA}${ultima_fila}"/>
 <sheetViews>
 <sheetView workbookViewId="0">
 <pane ySplit="7" topLeftCell="A8" activePane="bottomLeft" state="frozen"/>
@@ -107,10 +110,11 @@ return `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <col min="2" max="2" width="28"/>
 <col min="3" max="3" width="22"/>
 <col min="4" max="4" width="35"/>
-<col min="5" max="5" width="28"/>
+<col min="5" max="5" width="22"/>
+<col min="6" max="6" width="16"/>
 </cols>
 <sheetData>${filas_xml.join('')}</sheetData>
-<autoFilter ref="A7:E${ultima_fila}"/>
+<autoFilter ref="A7:${ULTIMA_COLUMNA}${ultima_fila}"/>
 <mergeCells count="${combinaciones.length}">${combinaciones.map((ref) => `<mergeCell ref="${ref}"/>`).join('')}</mergeCells>
 <pageMargins left="0.5" right="0.5" top="0.5" bottom="0.5" header="0.3" footer="0.3"/>
 <pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/>
@@ -169,8 +173,8 @@ const DRAWING = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xdr:clientData/>
 </xdr:twoCellAnchor>
 <xdr:twoCellAnchor editAs="oneCell">
-<xdr:from><xdr:col>4</xdr:col><xdr:colOff>681000</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>61913</xdr:rowOff></xdr:from>
-<xdr:to><xdr:col>4</xdr:col><xdr:colOff>1185825</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>509588</xdr:rowOff></xdr:to>
+<xdr:from><xdr:col>5</xdr:col><xdr:colOff>681000</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>61913</xdr:rowOff></xdr:from>
+<xdr:to><xdr:col>5</xdr:col><xdr:colOff>1185825</xdr:colOff><xdr:row>0</xdr:row><xdr:rowOff>509588</xdr:rowOff></xdr:to>
 <xdr:pic>
 <xdr:nvPicPr><xdr:cNvPr id="2" name="Logo Servicios de Salud Durango"/><xdr:cNvPicPr><a:picLocks noChangeAspect="1"/></xdr:cNvPicPr></xdr:nvPicPr>
 <xdr:blipFill><a:blip r:embed="rId2"/><a:stretch><a:fillRect/></a:stretch></xdr:blipFill>

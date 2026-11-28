@@ -99,7 +99,7 @@ class SaludBucalService {
                 connection
             );
 
-            await Bitacora.registrar(data.usuario.Id_Usuario, 'Registro de consulta de salud bucal', 'Salud Bucal', 'Consulta_Salud_Bucal', connection);
+            await Bitacora.registrar(data.usuario.Id_Usuario, 'Registro de consulta de salud bucal', 'Salud Bucal', 'Consulta_Salud_Bucal', connection, Id_Consulta);
 
             await connection.commit();
 

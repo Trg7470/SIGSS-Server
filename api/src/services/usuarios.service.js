@@ -3,6 +3,7 @@ const Usuarios = require('../models/usuarios.model');
 const Prestadores = require('../models/prestadores.model');
 const Bitacora = require('../models/bitacora.model');
 const Utils = require('../utils/utils');
+
 const UNIDAD_CESSA_DEFAULT = 8;
 const ID_ROL_MEDICO = 1;
 
@@ -25,9 +26,15 @@ class UsuariosService {
         try {
             await connection.beginTransaction();
 
-            const existente = await Usuarios.buscar_por_nombre_usuario(datos.nombre_usuario, connection);
+            const existente = await Usuarios.buscar_por_nombre_usuario(
+                datos.nombre_usuario,
+                connection
+            );
+
             if (existente) {
-                throw Object.assign(new Error('Ese nombre de usuario ya existe'), { status: 409 });
+                throw Object.assign(new Error('Ese nombre de usuario ya existe'), {
+                    status: 409
+                });
             }
 
             const resultado = await Usuarios.crear(
@@ -56,11 +63,13 @@ class UsuariosService {
                 'Crear usuario',
                 Utils.MODULOS_BITACORA.USUARIOS,
                 'Usuarios',
-                connection
+                connection,
+                resultado.id_usuario
             );
 
             await connection.commit();
             return resultado;
+
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -76,9 +85,15 @@ class UsuariosService {
             await connection.beginTransaction();
 
             if (datos.nombre_usuario) {
-                const existente = await Usuarios.buscar_por_nombre_usuario(datos.nombre_usuario, connection);
+                const existente = await Usuarios.buscar_por_nombre_usuario(
+                    datos.nombre_usuario,
+                    connection
+                );
+
                 if (existente && String(existente.Id_Usuario) !== String(id_usuario)) {
-                    throw Object.assign(new Error('Ese nombre de usuario ya existe'), { status: 409 });
+                    throw Object.assign(new Error('Ese nombre de usuario ya existe'), {
+                        status: 409
+                    });
                 }
             }
 
@@ -89,7 +104,9 @@ class UsuariosService {
             );
 
             if (!resultado.success) {
-                throw Object.assign(new Error('Usuario no encontrado'), { status: 404 });
+                throw Object.assign(new Error('Usuario no encontrado'), {
+                    status: 404
+                });
             }
 
             await Bitacora.registrar(
@@ -97,11 +114,13 @@ class UsuariosService {
                 'Actualizar usuario',
                 Utils.MODULOS_BITACORA.USUARIOS,
                 'Usuarios',
-                connection
+                connection,
+                id_usuario
             );
 
             await connection.commit();
             return resultado;
+
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -116,10 +135,16 @@ class UsuariosService {
         try {
             await connection.beginTransaction();
 
-            const resultado = await Usuarios.cambiar_estado(id_usuario, activo, connection);
+            const resultado = await Usuarios.cambiar_estado(
+                id_usuario,
+                activo,
+                connection
+            );
 
             if (!resultado.success) {
-                throw Object.assign(new Error('Usuario no encontrado'), { status: 404 });
+                throw Object.assign(new Error('Usuario no encontrado'), {
+                    status: 404
+                });
             }
 
             await Bitacora.registrar(
@@ -127,11 +152,13 @@ class UsuariosService {
                 activo ? 'Activar usuario' : 'Desactivar usuario',
                 Utils.MODULOS_BITACORA.USUARIOS,
                 'Usuarios',
-                connection
+                connection,
+                id_usuario
             );
 
             await connection.commit();
             return resultado;
+
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -146,10 +173,16 @@ class UsuariosService {
         try {
             await connection.beginTransaction();
 
-            const resultado = await Usuarios.cambiar_contrasena(id_usuario, contrasena_hash, connection);
+            const resultado = await Usuarios.cambiar_contrasena(
+                id_usuario,
+                contrasena_hash,
+                connection
+            );
 
             if (!resultado.success) {
-                throw Object.assign(new Error('Usuario no encontrado'), { status: 404 });
+                throw Object.assign(new Error('Usuario no encontrado'), {
+                    status: 404
+                });
             }
 
             await Bitacora.registrar(
@@ -157,11 +190,13 @@ class UsuariosService {
                 'Cambiar contraseña',
                 Utils.MODULOS_BITACORA.USUARIOS,
                 'Usuarios',
-                connection
+                connection,
+                id_usuario
             );
 
             await connection.commit();
             return resultado;
+
         } catch (error) {
             await connection.rollback();
             throw error;
